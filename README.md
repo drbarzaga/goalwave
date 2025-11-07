@@ -2,9 +2,27 @@
 
 # Goalwave
 
-<p align="center">
-Empower your financial journey – Set, track, and achieve your goals effortlessly with Goalwave.
-</p>
+**Empower your financial journey – Set, track, and achieve your goals effortlessly with Goalwave.**
+
+</div>
+
+---
+
+### 🎯 About Goalwave
+
+Goalwave is a modern, open-source web application designed to help you manage and achieve your financial goals. Built with cutting-edge technologies, Goalwave provides an intuitive interface for setting financial objectives, tracking progress, and staying motivated on your path to financial success.
+
+**Key Features:**
+
+- 🎯 **Goal Setting** - Create and customize your financial goals with ease
+- 📊 **Progress Tracking** - Visualize your progress with intuitive dashboards
+- 🔐 **Secure** - Built with modern authentication and security practices
+- 🚀 **Modern Stack** - Powered by Next.js, React, and TypeScript
+- 💾 **Reliable** - PostgreSQL database for secure data storage
+
+Whether you're saving for a dream vacation, planning for retirement, or working towards any financial milestone, Goalwave makes goal management simple, visual, and engaging.
+
+---
 
 [![GitHub stars](https://img.shields.io/github/stars/drbarzaga/goalwave?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=FFD700)](https://github.com/drbarzaga/goalwave/stargazers)
 [![GitHub forks](https://img.shields.io/github/forks/drbarzaga/goalwave?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=00D9FF)](https://github.com/drbarzaga/goalwave/forks)
@@ -14,11 +32,46 @@ Empower your financial journey – Set, track, and achieve your goals effortless
 
 </div>
 
+## 📑 Table of Contents
+
+- [Prerequisites](#-prerequisites)
+- [Quick Start](#-quick-start)
+- [Installation](#-installation)
+- [Development](#-development)
+- [Database Commands](#️-database-commands)
+- [Available Scripts](#-available-scripts)
+- [Contributing](#-contributing)
+- [Code of Conduct](#-code-of-conduct)
+- [License](#-license)
+- [Donate & Contribute](#donate--contribute)
+
 ## 📋 Prerequisites
 
 - Node.js 18+
 - npm, yarn, pnpm, or bun
 - Neon account (or any PostgreSQL database)
+
+## ⚡ Quick Start
+
+```bash
+# Clone the repository
+git clone https://github.com/drbarzaga/goalwave.git
+cd goalwave
+
+# Install dependencies
+npm install
+
+# Set up environment variables (see Installation section for details)
+cp .env.example .env.local  # If you have an example file, or create .env.local manually
+
+# Run database migrations
+npx drizzle-kit push
+
+# Start development server
+npm run dev
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
 
 ## 🛠️ Installation
 
@@ -48,6 +101,26 @@ BETTER_AUTH_SECRET=your_random_secret_key
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
+**Generating `BETTER_AUTH_SECRET`:**
+
+You can generate a secure random secret using one of these methods:
+
+```bash
+# Using Node.js
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+
+# Using OpenSSL
+openssl rand -hex 32
+
+# Using Python
+python -c "import secrets; print(secrets.token_hex(32))"
+```
+
+**Getting your `DATABASE_URL`:**
+
+- If using Neon: Get your connection string from your Neon project dashboard
+- Format: `postgresql://user:password@host:port/database?sslmode=require`
+
 4. Run database migrations:
 
 ```bash
@@ -70,7 +143,7 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-## Database Commands
+## 🗄️ Database Commands
 
 ```bash
 # Generate migrations
