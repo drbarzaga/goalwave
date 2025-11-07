@@ -1,8 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+# Goalwave
 
-First, run the development server:
+<p align="center">
+Empower your financial journey – Set, track, and achieve your goals effortlessly with Goalwave.
+</p>
+
+![GitHub stars](https://img.shields.io/github/stars/drbarzaga/goalwave?style=social)
+![GitHub forks](https://img.shields.io/github/forks/drbarzaga/goalwave?style=social)
+![GitHub issues](https://img.shields.io/github/issues/drbarzaga/goalwave)
+![GitHub pull requests](https://img.shields.io/github/issues-pr/drbarzaga/goalwave)
+![GitHub license](https://img.shields.io/github/license/drbarzaga/goalwave)
+
+</div>
+
+## 📋 Prerequisites
+
+- Node.js 18+
+- npm, yarn, pnpm, or bun
+- Neon account (or any PostgreSQL database)
+
+## 🛠️ Installation
+
+1. Clone the repository:
+
+```bash
+git clone <repository-url>
+cd goalwave
+```
+
+2. Install dependencies:
+
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
+
+3. Set up environment variables:
+   Create a `.env.local` file in the root directory with the following variables:
+
+```env
+DATABASE_URL=your_postgresql_connection_url
+BETTER_AUTH_SECRET=your_random_secret_key
+BETTER_AUTH_URL=http://localhost:3000
+```
+
+4. Run database migrations:
+
+```bash
+npx drizzle-kit push
+```
+
+## 🏃 Development
+
+Start the development server:
 
 ```bash
 npm run dev
@@ -14,23 +68,45 @@ pnpm dev
 bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Database Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Generate migrations
+npx drizzle-kit generate
 
-## Learn More
+# Apply migrations
+npx drizzle-kit push
 
-To learn more about Next.js, take a look at the following resources:
+# Open Drizzle Studio (visual interface)
+npx drizzle-kit studio
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📜 Available Scripts
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- `npm run dev` - Start development server
+- `npm run build` - Build the application for production
+- `npm run start` - Start production server
+- `npm run lint` - Run ESLint
 
-## Deploy on Vercel
+## 👥 Contributing
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Contributions are welcome! Here's how you can help:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Fork** the repository
+2. **Clone** your fork: `git clone https://github.com/drbarzaga/goalwave.git`
+3. **Create** a new branch: `git checkout -b feature/your-feature`
+4. **Commit** your changes: `git commit -am 'Add some feature'`
+5. **Push** to your branch: `git push origin feature/your-feature`
+6. **Open** a pull request using our [PR template](.github/pull_request_template.md)
+
+Please ensure your code follows the project's style guidelines and includes tests where applicable.
+
+### Code of Conduct
+
+This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
+
+## 📜 License
+
+This project is licensed under the MIT License.
