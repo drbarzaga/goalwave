@@ -25,7 +25,7 @@ Empower your financial journey – Set, track, and achieve your goals effortless
 1. Clone the repository:
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/drbarzaga/goalwave.git
 cd goalwave
 ```
 
@@ -83,7 +83,7 @@ npx drizzle-kit push
 npx drizzle-kit studio
 ```
 
-## 📜 Available Scripts
+## 📦 Available Scripts
 
 - `npm run dev` - Start development server
 - `npm run build` - Build the application for production
@@ -103,7 +103,7 @@ Contributions are welcome! Here's how you can help:
 
 Please ensure your code follows the project's style guidelines and includes tests where applicable.
 
-### Code of Conduct
+## 📜 Code of Conduct
 
 This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
 
