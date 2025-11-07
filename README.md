@@ -6,11 +6,11 @@
 Empower your financial journey – Set, track, and achieve your goals effortlessly with Goalwave.
 </p>
 
-![GitHub stars](https://img.shields.io/github/stars/drbarzaga/goalwave?style=social)
-![GitHub forks](https://img.shields.io/github/forks/drbarzaga/goalwave?style=social)
-![GitHub issues](https://img.shields.io/github/issues/drbarzaga/goalwave)
-![GitHub pull requests](https://img.shields.io/github/issues-pr/drbarzaga/goalwave)
-![GitHub license](https://img.shields.io/github/license/drbarzaga/goalwave)
+[![GitHub stars](https://img.shields.io/github/stars/drbarzaga/goalwave?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=FFD700)](https://github.com/drbarzaga/goalwave/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/drbarzaga/goalwave?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=00D9FF)](https://github.com/drbarzaga/goalwave/forks)
+[![GitHub issues](https://img.shields.io/github/issues/drbarzaga/goalwave?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=FF6B6B)](https://github.com/drbarzaga/goalwave/issues)
+[![GitHub pull requests](https://img.shields.io/github/issues-pr/drbarzaga/goalwave?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=51CF66)](https://github.com/drbarzaga/goalwave/pulls)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge&logo=github&logoColor=white&labelColor=181717&color=9775FA)](https://github.com/drbarzaga/goalwave/blob/main/LICENSE)
 
 </div>
 
@@ -95,7 +95,7 @@ npx drizzle-kit studio
 Contributions are welcome! Here's how you can help:
 
 1. **Fork** the repository
-2. **Clone** your fork: `git clone https://github.com/drbarzaga/goalwave.git`
+2. **Clone** your fork
 3. **Create** a new branch: `git checkout -b feature/your-feature`
 4. **Commit** your changes: `git commit -am 'Add some feature'`
 5. **Push** to your branch: `git push origin feature/your-feature`
@@ -110,3 +110,27 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 ## 📜 License
 
 This project is licensed under the MIT License.
+
+<div align="center">
+
+## Donate & Contribute
+
+### 🤝 Contribute to the Project
+
+[![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-blue?style=for-the-badge&logo=github)](https://github.com/drbarzaga/goalwave/issues)
+[![GitHub Discussions](https://img.shields.io/badge/GitHub-Discussions-purple?style=for-the-badge&logo=github)](https://github.com/drbarzaga/goalwave/discussions)
+[![Pull Requests](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge)](https://github.com/drbarzaga/goalwave/pulls)
+
+### 💰 Donate to Support Development
+
+**If you find Goalwave helpful, please consider supporting its development!**
+
+<a href="https://github.com/sponsors/drbarzaga" target="_blank">
+  <img src="https://img.shields.io/badge/GitHub-Sponsor-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="GitHub Sponsors">
+</a>
+
+**Every contribution helps make Goalwave better!** 🚀
+
+**Made with ❤️ by the Goalwave community** | ⭐ **Star this repo if you find it helpful!**
+
+</div>
