@@ -184,6 +184,14 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 
 This project is licensed under the MIT License.
 
+## 🙏🏻 Contributors 
+
+Thanks goes to these wonderful people
+
+<a href="https://github.com/drbarzaga/goalwave/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=drbarzaga/goalwave" />
+</a>
+
 <div align="center">
 
 ## Donate & Contribute
@@ -204,6 +212,6 @@ This project is licensed under the MIT License.
 
 **Every contribution helps make Goalwave better!** 🚀
 
-**Made with ❤️ by the Goalwave community** | ⭐ **Star this repo if you find it helpful!**
-
+⭐ **Star us on GitHub — it helps!** <br/>
+**Made with ❤️ by the Goalwave community**
 </div>
