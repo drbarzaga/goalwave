@@ -45,6 +45,8 @@ We love feature suggestions! Please open an issue with:
    npx drizzle-kit push       # Set up the database
    ```
 
+   **Important:** This project requires a Neon database. See the [Database Setup](#-database-setup) section below for detailed instructions.
+
 4. **Make your changes**
 
    - Write clean, maintainable code
@@ -138,6 +140,105 @@ src/
 - Keep components focused and reusable
 - Extract complex logic into custom hooks
 - Use the UI components from `components/ui/` when possible
+
+### Database Setup
+
+This project uses **Neon** (a serverless PostgreSQL database) for data storage. Each contributor needs to set up their own Neon database for local development.
+
+#### Step 1: Create a Neon Account
+
+1. Go to [https://neon.com](https://neon.com)
+2. Sign up for a free account (no credit card required for the free tier)
+3. Verify your email address
+
+#### Step 2: Create a New Project
+
+1. Once logged in, click **"Create a project"**
+2. Choose a project name (e.g., `goalwave-dev`)
+3. Select a region closest to you for better performance
+4. Choose **PostgreSQL** as the database engine
+5. Click **"Create project"**
+
+#### Step 3: Get Your Connection String
+
+1. After creating the project, you'll be taken to the project dashboard
+2. Look for the **"Connection string"** section
+3. Copy the connection string (it should look like: `postgresql://user:password@host.neon.tech/dbname?sslmode=require`)
+4. **Important:** Make sure to copy the connection string that includes your password, not the one that says "without password"
+
+#### Step 4: Configure Environment Variables
+
+1. Open the `.env` file and fill in the required variables:
+
+   ```env
+   # Database Configuration
+   DATABASE_URL=your_neon_connection_string_here
+
+   # Better Auth Configuration
+   # Generate a random secret key using: openssl rand -base64 32
+   BETTER_AUTH_SECRET=your_random_secret_key_here
+
+   # Application URL (for development)
+   BETTER_AUTH_URL=http://localhost:3000
+   ```
+
+2. **Generate a secure secret key** for `BETTER_AUTH_SECRET`:
+
+   ```bash
+   # On macOS/Linux:
+   openssl rand -base64 32
+
+   # Or use an online generator:
+   # https://generate-secret.vercel.app/32
+   ```
+
+#### Step 5: Run Database Migrations
+
+After setting up your environment variables, run the database migrations to create the necessary tables:
+
+```bash
+npx drizzle-kit push
+```
+
+This will create all the required database tables based on the schema defined in `src/db/schema.ts`.
+
+#### Step 6: Verify Your Setup
+
+1. Start the development server:
+
+   ```bash
+   npm run dev
+   ```
+
+2. Visit [http://localhost:3000](http://localhost:3000)
+3. Try creating an account to verify the database connection works
+
+#### Additional Database Commands
+
+```bash
+# Generate migrations (when schema changes)
+npx drizzle-kit generate
+
+# Apply migrations
+npx drizzle-kit push
+
+# Open Drizzle Studio (visual database browser)
+npx drizzle-kit studio
+```
+
+#### Troubleshooting
+
+- **Connection errors:** Make sure your `DATABASE_URL` includes `?sslmode=require` at the end
+- **Migration errors:** Ensure you've copied the full connection string with password
+- **"Database does not exist" errors:** Double-check that you're using the correct connection string from your Neon dashboard
+- **Rate limiting:** The free tier has some limits; if you hit them, wait a few minutes or upgrade your Neon plan
+
+#### Best Practices
+
+- **Use separate databases** for development and testing if needed
+- **Never commit** your `.env` file to version control
+- **Keep your connection string secure** - don't share it publicly
+- **Use Neon's branching feature** for testing schema changes in isolation (optional)
 
 ### Database Changes
 
