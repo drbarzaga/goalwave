@@ -53,14 +53,6 @@ export default function SignUpForm() {
               <Label htmlFor="pwd" className="text-sm">
                 Password
               </Label>
-              <Button asChild variant="link" size="sm">
-                <Link
-                  href="#"
-                  className="link intent-info variant-ghost text-sm"
-                >
-                  Forgot your Password ?
-                </Link>
-              </Button>
             </div>
             <Input
               type="password"
