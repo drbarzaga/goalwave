@@ -55,11 +55,20 @@ We love feature suggestions! Please open an issue with:
 
 5. **Set up the development environment**
 
+   **Important:** This project uses a specific Node.js version. We recommend using [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) to manage Node.js versions.
+
    ```bash
+   # If you're using nvm, install and use the recommended Node.js version
+   nvm install
+   nvm use
+
+   # Install dependencies
    npm install
    cp .env.example .env       # Configure your environment variables
    npx drizzle-kit push       # Set up the database
    ```
+
+   **Note:** The project includes a `.nvmrc` file with the recommended Node.js version. If you're using nvm, running `nvm use` will automatically switch to the correct version.
 
    **Important:** This project requires a Neon database. See the [Database Setup](#-database-setup) section below for detailed instructions.
 

@@ -45,7 +45,10 @@ Whether you're saving for a dream vacation, planning for retirement, or working 
 
 ## 📋 Prerequisites
 
-- Node.js 18+
+- **Node.js** - We recommend using [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) to manage Node.js versions
+  - The project includes a `.nvmrc` file with the recommended Node.js version
+  - If using nvm: `nvm install` and `nvm use` will automatically use the correct version
+  - Minimum: Node.js 18+
 - npm, yarn, pnpm, or bun
 - Neon account (or any PostgreSQL database)
 
@@ -55,6 +58,10 @@ Whether you're saving for a dream vacation, planning for retirement, or working 
 # Clone the repository
 git clone https://github.com/drbarzaga/goalwave.git
 cd goalwave
+
+# If using nvm, install and use the recommended Node.js version
+nvm install
+nvm use
 
 # Install dependencies
 npm install
@@ -80,7 +87,15 @@ git clone https://github.com/drbarzaga/goalwave.git
 cd goalwave
 ```
 
-2. Install dependencies:
+2. Install the recommended Node.js version (if using nvm):
+
+```bash
+# If you're using nvm, install and use the recommended Node.js version
+nvm install
+nvm use
+```
+
+3. Install dependencies:
 
 ```bash
 npm install
@@ -90,7 +105,7 @@ yarn install
 pnpm install
 ```
 
-3. Set up environment variables:
+4. Set up environment variables:
    Create a `.env.local` file in the root directory with the following variables:
 
 ```env
@@ -104,7 +119,7 @@ BETTER_AUTH_URL=http://localhost:3000
 - If using Neon: Get your connection string from your Neon project dashboard
 - Format: `postgresql://user:password@host:port/database?sslmode=require`
 
-4. Run database migrations:
+5. Run database migrations:
 
 ```bash
 npx drizzle-kit push
@@ -196,5 +211,3 @@ If you find Goalwave useful, consider supporting its development:
 Made with ❤️ by the Goalwave community
 
 </div>
-
-
