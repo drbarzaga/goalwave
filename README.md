@@ -32,18 +32,16 @@ Whether you're saving for a dream vacation, planning for retirement, or working 
 
 </div>
 
-## 📑 Table of Contents
+## 🚀 Key Features
 
-- [Prerequisites](#-prerequisites)
-- [Quick Start](#-quick-start)
-- [Installation](#-installation)
-- [Development](#-development)
-- [Database Commands](#️-database-commands)
-- [Available Scripts](#-available-scripts)
-- [Contributing](#-contributing)
-- [Code of Conduct](#-code-of-conduct)
-- [License](#-license)
-- [Donate & Contribute](#donate--contribute)
+- 🎯 **Create personalized financial goals**
+- 📈 **Visual tracking of each goal's progress**
+- 👥 **User account management and secure authentication**
+- 💬 **Motivational notifications and reminders**
+- 🌙 **Dark mode and customization settings**
+- 📱 **Intuitive and mobile-friendly interface**
+- 🔔 **Dashboard with progress alerts and tips**
+- 🗃️ **History and analysis of achievements**
 
 ## 📋 Prerequisites
 
@@ -166,7 +164,7 @@ This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participatin
 
 This project is licensed under the MIT License.
 
-## 🙏🏻 Contributors 
+## 🙏🏻 Contributors
 
 Thanks goes to these wonderful people
 
@@ -196,4 +194,5 @@ Thanks goes to these wonderful people
 
 ⭐ **Star us on GitHub — it helps!** <br/>
 **Made with ❤️ by the Goalwave community**
+
 </div>
