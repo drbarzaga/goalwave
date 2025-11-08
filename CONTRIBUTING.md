@@ -103,15 +103,32 @@ We love feature suggestions! Please open an issue with:
 
 ```
 src/
-├── app/              # Next.js App Router pages
-├── components/       # React components
-│   ├── features/    # Feature-specific components
-│   ├── layout/      # Layout components
-│   ├── shared/      # Shared components
-│   └── ui/          # UI primitives
-├── lib/             # Utilities and configurations
-├── db/              # Database schema and migrations
-└── types/           # TypeScript type definitions
+├── app/                   # Next.js App Router (pages, layouts, API routes)
+│   ├── (auth)/            # Authentication pages and routes
+│       ├── login/         # Login page
+│       ├── signup/        # Signup page
+│       ├── forgot-password/   # Forgot password page
+│       ├── reset-password/    # Reset password page
+│       └── layout.tsx     # Authentication layout
+│   ├── (app)/             # App pages and routes
+│       ├── dashboard/     # Dashboard page
+│       ├── goals/         # Goals page
+│       ├── settings/      # Settings page
+│       ├── layout.tsx     # App layout
+│       └── page.tsx       # App page
+│   └── (marketing)/       # Marketing pages and routes
+│       ├── layout.tsx     # Marketing layout
+│       └── page.tsx       # Marketing page
+│   ├── api/               # API routes
+│       └── auth/          # Authentication API routes
+├── components/            # React components
+│   ├── features/          # Feature-specific components
+│   ├── layout/            # Layout and wrapper components
+│   ├── shared/            # Shared/reusable components
+│   └── ui/                # UI primitives (shadcn/ui)
+├── lib/                   # Utilities, helpers, and configurations
+├── db/                    # Database schema and migrations (drizzle)
+└── types/                 # TypeScript type definitions
 ```
 
 ### Component Guidelines
