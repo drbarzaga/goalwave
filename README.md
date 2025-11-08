@@ -166,33 +166,35 @@ This project is licensed under the MIT License.
 
 ## 🙏🏻 Contributors
 
-Thanks goes to these wonderful people
+Thanks to these amazing people for helping build Goalwave:
 
 <a href="https://github.com/drbarzaga/goalwave/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=drbarzaga/goalwave" />
 </a>
 
+---
+
 <div align="center">
 
-## Donate & Contribute
+## 💛 Support the Project
 
-### 🤝 Contribute to the Project
+[![GitHub Issues](https://img.shields.io/badge/Issues-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/drbarzaga/goalwave/issues)
+[![GitHub Discussions](https://img.shields.io/badge/Discussions-6e40c9?style=for-the-badge&logo=github&logoColor=white)](https://github.com/drbarzaga/goalwave/discussions)
+[![Pull Requests](https://img.shields.io/badge/PRs%20Welcome-2ecc71?style=for-the-badge&logo=github&logoColor=white)](https://github.com/drbarzaga/goalwave/pulls)
 
-[![GitHub Issues](https://img.shields.io/badge/GitHub-Issues-blue?style=for-the-badge&logo=github)](https://github.com/drbarzaga/goalwave/issues)
-[![GitHub Discussions](https://img.shields.io/badge/GitHub-Discussions-purple?style=for-the-badge&logo=github)](https://github.com/drbarzaga/goalwave/discussions)
-[![Pull Requests](https://img.shields.io/badge/PRs-Welcome-brightgreen?style=for-the-badge)](https://github.com/drbarzaga/goalwave/pulls)
+### 💰 Donate & Sponsor
 
-### 💰 Donate to Support Development
-
-**If you find Goalwave helpful, please consider supporting its development!**
+If you find Goalwave useful, consider supporting its development:
 
 <a href="https://github.com/sponsors/drbarzaga" target="_blank">
-  <img src="https://img.shields.io/badge/GitHub-Sponsor-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="GitHub Sponsors">
+  <img src="https://img.shields.io/badge/Sponsor%20on%20GitHub-ea4aaa?style=for-the-badge&logo=github-sponsors&logoColor=white" alt="GitHub Sponsors" />
 </a>
 
-**Every contribution helps make Goalwave better!** 🚀
+---
 
-⭐ **Star us on GitHub — it helps!** <br/>
-**Made with ❤️ by the Goalwave community**
+⭐ **Star the repo to help it grow!**  
+Made with ❤️ by the Goalwave community
 
 </div>
+
+
