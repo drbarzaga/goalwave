@@ -43,15 +43,6 @@ Whether you're saving for a dream vacation, planning for retirement, or working 
 - 🔔 **Dashboard with progress alerts and tips**
 - 🗃️ **History and analysis of achievements**
 
-## 📋 Prerequisites
-
-- **Node.js** - We recommend using [nvm](https://github.com/nvm-sh/nvm) (Node Version Manager) to manage Node.js versions
-  - The project includes a `.nvmrc` file with the recommended Node.js version
-  - If using nvm: `nvm install` and `nvm use` will automatically use the correct version
-  - Minimum: Node.js 18+
-- npm, yarn, pnpm, or bun
-- Neon account (or any PostgreSQL database)
-
 ## 🤝 Contributing
 
 We welcome contributions! For detailed information on installation, development setup, database configuration, and the contribution process, please see our [Contributing Guide](./CONTRIBUTING.md).
