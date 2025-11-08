@@ -29,7 +29,7 @@ export default function SignUpForm() {
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
               <Label htmlFor="firstname" className="block text-sm">
-                Firstname
+                First name
               </Label>
               <Input type="text" required name="firstname" id="firstname" />
             </div>
