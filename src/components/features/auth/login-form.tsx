@@ -58,9 +58,7 @@ export default function LoginForm() {
           </div>
 
           {/* <Button className="w-full">Sign In</Button> */}
-          <SubmitButton className="w-full" loading>
-            Sign In
-          </SubmitButton>
+          <SubmitButton className="w-full">Sign In</SubmitButton>
         </div>
 
         <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
