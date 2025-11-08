@@ -71,7 +71,7 @@ export default function SignUpForm() {
             />
           </div>
 
-          <Button className="w-full">Sign In</Button>
+          <Button className="w-full">Sign Up</Button>
         </div>
 
         <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
