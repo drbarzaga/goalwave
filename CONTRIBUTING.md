@@ -41,7 +41,7 @@ We love feature suggestions! Please open an issue with:
 
    ```bash
    npm install
-   cp .env.example .env.local  # Configure your environment variables
+   cp .env.example .env       # Configure your environment variables
    npx drizzle-kit push       # Set up the database
    ```
 
@@ -68,12 +68,14 @@ We love feature suggestions! Please open an issue with:
 
    Use clear, descriptive commit messages following conventional commits:
 
-   - `Add:` for new features
-   - `Fix:` for bug fixes
-   - `Update:` for updates to existing features
-   - `Refactor:` for code refactoring
-   - `Docs:` for documentation changes
-   - `Style:` for formatting changes
+   - `feat:` for new features
+   - `fix:` for bug fixes
+   - `update:` for updates to existing features
+   - `refactor:` for code refactoring
+   - `docs:` for documentation changes
+   - `style:` for formatting changes
+   - `test:` for adding or updating tests
+   - `chore:` for build process, tooling, dependencies
 
 7. **Push to your fork**
 
