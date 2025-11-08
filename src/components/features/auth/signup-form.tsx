@@ -34,7 +34,7 @@ export default function SignUpForm() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="lastname" className="block text-sm">
-                Lastname
+                Last name
               </Label>
               <Input type="text" required name="lastname" id="lastname" />
             </div>
