@@ -33,11 +33,11 @@ We love feature suggestions! Please open an issue with:
 2. **Clone your fork**
 
    ```bash
-   git clone https://github.com/your-username/goalwave.git
+   git clone https://github.com/<your-username>/goalwave.git
    cd goalwave
    ```
 
-   **Note:** Replace `your-username` with your actual GitHub username.
+   **Note:** Replace `<your-username>` with your actual GitHub username.
 
 3. **Add the upstream repository** (optional but recommended)
 
