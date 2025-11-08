@@ -71,7 +71,7 @@ export function createPageMetadata({
 export const pageMetadata = {
   home: (): Metadata =>
     createPageMetadata({
-      title: `${appName} - Home`,
+      title: `Home`,
       description:
         appDescription ||
         "Achieve your financial goals with GoalWave. Track your progress, set milestones, and reach your dreams.",
