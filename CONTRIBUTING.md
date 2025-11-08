@@ -26,18 +26,34 @@ We love feature suggestions! Please open an issue with:
 
 1. **Fork the repository**
 
+   - Go to [https://github.com/drbarzaga/goalwave](https://github.com/drbarzaga/goalwave)
+   - Click the **"Fork"** button in the top right corner
+   - This creates a copy of the repository in your GitHub account
+
+2. **Clone your fork**
+
    ```bash
    git clone https://github.com/your-username/goalwave.git
    cd goalwave
    ```
 
-2. **Create a feature branch**
+   **Note:** Replace `your-username` with your actual GitHub username.
+
+3. **Add the upstream repository** (optional but recommended)
+
+   ```bash
+   git remote add upstream https://github.com/drbarzaga/goalwave.git
+   ```
+
+   This allows you to sync your fork with the main repository later.
+
+4. **Create a feature branch**
 
    ```bash
    git checkout -b feature/your-feature-name
    ```
 
-3. **Set up the development environment**
+5. **Set up the development environment**
 
    ```bash
    npm install
@@ -47,14 +63,14 @@ We love feature suggestions! Please open an issue with:
 
    **Important:** This project requires a Neon database. See the [Database Setup](#-database-setup) section below for detailed instructions.
 
-4. **Make your changes**
+6. **Make your changes**
 
    - Write clean, maintainable code
    - Follow the existing code style
    - Add comments where necessary
    - Update documentation if needed
 
-5. **Test your changes**
+7. **Test your changes**
 
    ```bash
    npm run dev        # Test locally
@@ -62,7 +78,7 @@ We love feature suggestions! Please open an issue with:
    npm run build      # Ensure it builds successfully
    ```
 
-6. **Commit your changes**
+8. **Commit your changes**
 
    ```bash
    git commit -m "Add: description of your changes"
@@ -79,17 +95,18 @@ We love feature suggestions! Please open an issue with:
    - `test:` for adding or updating tests
    - `chore:` for build process, tooling, dependencies
 
-7. **Push to your fork**
+9. **Push to your fork**
 
    ```bash
    git push origin feature/your-feature-name
    ```
 
-8. **Open a Pull Request**
-   - Use our [PR template](.github/pull_request_template.md)
-   - Provide a clear description of your changes
-   - Reference any related issues
-   - Wait for review and feedback
+10. **Open a Pull Request**
+
+- Use our [PR template](.github/pull_request_template.md)
+- Provide a clear description of your changes
+- Reference any related issues
+- Wait for review and feedback
 
 ## 📋 Development Guidelines
 
