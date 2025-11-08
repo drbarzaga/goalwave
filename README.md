@@ -148,24 +148,21 @@ npx drizzle-kit studio
 - `npm run start` - Start production server
 - `npm run lint` - Run ESLint
 
-## 👥 Contributing
+## 🤝 Contributing
 
-Contributions are welcome! Here's how you can help:
+We welcome contributions! Please see our [Contributing Guide](./Contributing.md) for details.
 
-1. **Fork** the repository
-2. **Clone** your fork
-3. **Create** a new branch: `git checkout -b feature/your-feature`
-4. **Commit** your changes: `git commit -am 'Add some feature'`
-5. **Push** to your branch: `git push origin feature/your-feature`
-6. **Open** a pull request using our [PR template](.github/pull_request_template.md)
-
-Please ensure your code follows the project's style guidelines and includes tests where applicable.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request using our [PR template](.github/pull_request_template.md)
 
 ## 📜 Code of Conduct
 
 This project adheres to a [Code of Conduct](CODE_OF_CONDUCT.md). By participating, you are expected to uphold this code. Please report unacceptable behavior to the project maintainers.
 
-## 📜 License
+## 📝 License
 
 This project is licensed under the MIT License.
 
