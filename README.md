@@ -101,21 +101,6 @@ BETTER_AUTH_SECRET=your_random_secret_key
 BETTER_AUTH_URL=http://localhost:3000
 ```
 
-**Generating `BETTER_AUTH_SECRET`:**
-
-You can generate a secure random secret using one of these methods:
-
-```bash
-# Using Node.js
-node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-
-# Using OpenSSL
-openssl rand -hex 32
-
-# Using Python
-python -c "import secrets; print(secrets.token_hex(32))"
-```
-
 **Getting your `DATABASE_URL`:**
 
 - If using Neon: Get your connection string from your Neon project dashboard
