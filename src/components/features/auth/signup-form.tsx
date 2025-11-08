@@ -2,6 +2,6 @@
 
 import React from "react";
 
-export default function SignupForm() {
-  return <div>SignupForm</div>;
+export default function SignUpForm() {
+  return <div>SignUpForm</div>;
 }
