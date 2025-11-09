@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/providers/theme-provider";
+import { getCompanyDescription, getCompanyName } from "@/lib/utils";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,10 +16,10 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: process.env.NEXT_PUBLIC_APP_NAME!,
-    template: `%s | ${process.env.NEXT_PUBLIC_APP_NAME!}`,
+    default: getCompanyName(),
+    template: `%s | ${getCompanyName()}`,
   },
-  description: process.env.NEXT_PUBLIC_APP_DESCRIPTION!,
+  description: getCompanyDescription(),
   icons: {
     icon: "/favicon.ico",
   },
