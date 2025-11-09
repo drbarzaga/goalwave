@@ -25,6 +25,7 @@ export default function GitHubStarsButton({
         size={size}
         username={username}
         repo={repo}
+        content="GitHub Stars"
         className="cursor-pointer"
       />
     </Link>
