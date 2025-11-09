@@ -12,3 +12,10 @@ export function getYear() {
 export function getCompanyName() {
   return process.env.NEXT_PUBLIC_COMPANY_NAME || "Goalwave";
 }
+
+export function getCompanyDescription() {
+  return (
+    process.env.NEXT_PUBLIC_COMPANY_DESCRIPTION ||
+    "Goalwave is a platform for creating and managing your goals."
+  );
+}

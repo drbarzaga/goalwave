@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import GoogleButton from "@/components/shared/google-button";
 import SubmitButton from "@/components/shared/submit-button";
+import { getCompanyName } from "@/lib/utils";
 
 export default function LoginForm() {
   return (
@@ -21,7 +22,7 @@ export default function LoginForm() {
             <LogoIcon />
           </Link>
           <h1 className="mb-1 mt-4 text-xl font-semibold">
-            Sign In to {process.env.NEXT_PUBLIC_APP_NAME}
+            Sign In to {getCompanyName()}
           </h1>
           <p className="text-sm">Welcome back! Sign in to continue</p>
         </div>
@@ -57,7 +58,6 @@ export default function LoginForm() {
             />
           </div>
 
-          {/* <Button className="w-full">Sign In</Button> */}
           <SubmitButton className="w-full">Sign In</SubmitButton>
         </div>
 

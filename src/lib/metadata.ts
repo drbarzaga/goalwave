@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
+import { getCompanyDescription, getCompanyName } from "./utils";
 
-const appName = process.env.NEXT_PUBLIC_APP_NAME || "Goalwave";
-const appDescription = process.env.NEXT_PUBLIC_APP_DESCRIPTION || "";
+const appName = getCompanyName() || "Goalwave";
+const appDescription = getCompanyDescription() || "";
 const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
 
 /**
