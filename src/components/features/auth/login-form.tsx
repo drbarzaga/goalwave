@@ -1,20 +1,53 @@
 "use client";
 
-import React from "react";
+import React, { useActionState, useEffect } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/components/logo";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+
 import GoogleButton from "@/components/shared/google-button";
 import SubmitButton from "@/components/shared/submit-button";
 import { getCompanyName } from "@/lib/utils";
+import { actions } from "@/actions";
+import { ActionResult } from "@/types/core";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
+const INITIAL_STATE: ActionResult<{ email: string; password: string }> = {
+  data: {
+    email: "",
+    password: "",
+  },
+  success: false,
+  message: undefined,
+  fieldErrors: {},
+};
 
 export default function LoginForm() {
+  const router = useRouter();
+  const [formState, formAction, isPending] = useActionState(
+    actions.auth.signIn,
+    INITIAL_STATE
+  );
+
+  useEffect(() => {
+    if (formState.message) {
+      toast[formState.success ? "success" : "error"](formState.message);
+    }
+
+    if (formState.success) {
+      router.push("/dashboard");
+    }
+  }, [formState, router]);
+
   return (
     <form
-      action=""
+      action={formAction}
       className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"
+      noValidate
     >
       <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
         <div className="text-center">
@@ -29,33 +62,47 @@ export default function LoginForm() {
 
         <div className="mt-6 space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="email" className="block text-sm">
-              Username
-            </Label>
-            <Input type="email" required name="email" id="email" />
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                type="email"
+                required
+                name="email"
+                id="email"
+                disabled={isPending}
+                defaultValue={formState.data?.email ?? ""}
+              />
+              <FieldError>
+                {formState.fieldErrors?.email?.[0]?.toString()}
+              </FieldError>
+            </Field>
           </div>
 
           <div className="space-y-0.5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="pwd" className="text-sm">
-                Password
-              </Label>
-              <Button asChild variant="link" size="sm">
-                <Link
-                  href="/forgot-password"
-                  className="link intent-info variant-ghost text-sm"
-                >
-                  Forgot your Password ?
-                </Link>
-              </Button>
-            </div>
-            <Input
-              type="password"
-              required
-              name="pwd"
-              id="pwd"
-              className="input sz-md variant-mixed"
-            />
+            <Field>
+              <div className="flex items-center justify-between">
+                <FieldLabel htmlFor="password">Password</FieldLabel>
+                <Button asChild variant="link" size="sm">
+                  <Link
+                    href="/forgot-password"
+                    className="link intent-info variant-ghost text-sm"
+                  >
+                    Forgot your Password ?
+                  </Link>
+                </Button>
+              </div>
+              <Input
+                type="password"
+                required
+                name="password"
+                id="password"
+                disabled={isPending}
+                defaultValue={formState.data?.password ?? ""}
+              />
+              <FieldError>
+                {formState.fieldErrors?.password?.[0]?.toString()}
+              </FieldError>
+            </Field>
           </div>
 
           <SubmitButton className="w-full">Sign In</SubmitButton>

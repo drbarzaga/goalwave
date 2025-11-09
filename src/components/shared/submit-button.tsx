@@ -1,6 +1,9 @@
+"use client";
+
 import React from "react";
 import { Button } from "../ui/button";
 import { Spinner } from "@/components/ui/spinner";
+import { useFormStatus } from "react-dom";
 
 interface SubmitButtonProps
   extends React.ButtonHTMLAttributes<HTMLButtonElement> {
@@ -26,9 +29,19 @@ export default function SubmitButton({
   loadingText = "",
   ...props
 }: SubmitButtonProps) {
+  const { pending } = useFormStatus();
+
+  const isLoading = loading || pending;
+
   return (
-    <Button className={className} variant={variant} size={size} {...props}>
-      {loading ? (
+    <Button
+      className={className}
+      variant={variant}
+      size={size}
+      disabled={isLoading}
+      {...props}
+    >
+      {isLoading ? (
         <div className="flex items-center justify-center">
           <Spinner />
           <span className="ml-2">{loadingText}</span>

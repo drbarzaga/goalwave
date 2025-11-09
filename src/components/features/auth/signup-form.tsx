@@ -1,17 +1,51 @@
 "use client";
 
-import React from "react";
+import React, { useActionState, useEffect } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/components/logo";
-import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import GoogleButton from "@/components/shared/google-button";
+
+import { Field, FieldError, FieldLabel } from "@/components/ui/field";
+
 import { getCompanyName } from "@/lib/utils";
+import { ActionResult } from "@/types/core";
+import { SignUpSchema } from "@/types/auth";
+import { actions } from "@/actions";
+import SubmitButton from "@/components/shared/submit-button";
+import { toast } from "sonner";
+
+const INITIAL_STATE: ActionResult<SignUpSchema> = {
+  data: {
+    firstname: "",
+    lastname: "",
+    email: "",
+    password: "",
+  },
+  success: false,
+  message: undefined,
+  fieldErrors: {},
+};
 
 export default function SignUpForm() {
+  const [formState, formAction, isPending] = useActionState(
+    actions.auth.signUp,
+    INITIAL_STATE
+  );
+
+  useEffect(() => {
+    if (formState.message) {
+      toast[formState.success ? "success" : "error"](formState.message);
+    }
+  }, [formState]);
+
   return (
-    <form className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]">
+    <form
+      action={formAction}
+      noValidate
+      className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"
+    >
       <div className="bg-card -m-px rounded-[calc(var(--radius)+.125rem)] border p-8 pb-6">
         <div className="text-center">
           <Link href="/" aria-label="go home" className="mx-auto block w-fit">
@@ -26,42 +60,75 @@ export default function SignUpForm() {
         <div className="mt-6 space-y-6">
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-2">
-              <Label htmlFor="firstname" className="block text-sm">
-                First name
-              </Label>
-              <Input type="text" required name="firstname" id="firstname" />
+              <Field>
+                <FieldLabel htmlFor="firstname">First name</FieldLabel>
+                <Input
+                  type="text"
+                  required
+                  name="firstname"
+                  id="firstname"
+                  disabled={isPending}
+                  defaultValue={formState.data?.firstname ?? ""}
+                />
+                <FieldError>
+                  {formState.fieldErrors?.firstname?.[0]?.toString()}
+                </FieldError>
+              </Field>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="lastname" className="block text-sm">
-                Last name
-              </Label>
-              <Input type="text" required name="lastname" id="lastname" />
+              <Field>
+                <FieldLabel htmlFor="lastname">Last name</FieldLabel>
+                <Input
+                  type="text"
+                  required
+                  name="lastname"
+                  id="lastname"
+                  disabled={isPending}
+                  defaultValue={formState.data?.lastname ?? ""}
+                />
+                <FieldError>
+                  {formState.fieldErrors?.lastname?.[0]?.toString()}
+                </FieldError>
+              </Field>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="email" className="block text-sm">
-              Email
-            </Label>
-            <Input type="email" required name="email" id="email" />
+            <Field>
+              <FieldLabel htmlFor="email">Email</FieldLabel>
+              <Input
+                type="email"
+                required
+                name="email"
+                id="email"
+                disabled={isPending}
+                defaultValue={formState.data?.email ?? ""}
+              />
+              <FieldError>
+                {formState.fieldErrors?.email?.[0]?.toString()}
+              </FieldError>
+            </Field>
           </div>
 
           <div className="space-y-0.5">
-            <div className="flex items-center justify-between">
-              <Label htmlFor="pwd" className="text-sm">
-                Password
-              </Label>
-            </div>
-            <Input
-              type="password"
-              required
-              name="pwd"
-              id="pwd"
-              className="input sz-md variant-mixed"
-            />
+            <Field>
+              <FieldLabel htmlFor="password">Password</FieldLabel>
+              <Input
+                type="password"
+                required
+                name="password"
+                id="password"
+                disabled={isPending}
+                defaultValue={formState.data?.password ?? ""}
+              />
+              <FieldError>
+                {formState.fieldErrors?.password?.[0]?.toString()}
+              </FieldError>
+            </Field>
           </div>
 
-          <Button className="w-full">Sign Up</Button>
+          {/* <Button className="w-full">Sign Up</Button> */}
+          <SubmitButton className="w-full">Sign Up</SubmitButton>
         </div>
 
         <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">

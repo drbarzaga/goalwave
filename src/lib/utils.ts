@@ -19,3 +19,11 @@ export function getCompanyDescription() {
     "Goalwave is a platform for creating and managing your goals."
   );
 }
+
+export function getFullName(firstname: string, lastname: string) {
+  if (!firstname && !lastname) return "";
+  if (!firstname) return lastname.trim();
+  if (!lastname) return firstname.trim();
+
+  return `${firstname} ${lastname}`.trim();
+}
