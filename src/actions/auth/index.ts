@@ -96,7 +96,7 @@ export async function signUpAction(
     });
 
     return createSuccessResult(
-      "Signed up successfully, please check your email to verify your account",
+      "Account created successfully, please check your email for verification",
       {
         firstname,
         lastname,
