@@ -18,7 +18,7 @@ const menuItems: { name: string; href: string }[] = [
 export default function Header() {
   const [menuState, setMenuState] = useState(false);
 
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending } = authClient.useSession();
 
   return (
     <header>
@@ -67,12 +67,17 @@ export default function Header() {
 
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit lg:border-l lg:pl-6">
                 <ModeToggle />
-                {session ? (
+                {isPending ? (
+                  <div className="flex gap-3">
+                    <div className="h-8 w-16 animate-pulse rounded-md bg-muted" />
+                    <div className="h-8 w-16 animate-pulse rounded-md bg-muted" />
+                  </div>
+                ) : session ? (
                   <Button asChild variant="outline" size="sm">
                     <Link href="/dashboard">
                       <span className="flex items-center">
                         <GoalIcon className="size-4 mr-2" />
-                        Your Dashboard
+                        Go to Dashboard
                       </span>
                     </Link>
                   </Button>
