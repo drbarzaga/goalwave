@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState, useEffect } from "react";
+import React, { startTransition, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/components/logo";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,10 @@ import { SignUpSchema } from "@/types/auth";
 import { actions } from "@/actions";
 import SubmitButton from "@/components/shared/submit-button";
 import { toast } from "sonner";
+
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signUpSchema } from "@/lib/validations/auth";
 
 const INITIAL_STATE: ActionResult<SignUpSchema> = {
   data: {
@@ -34,6 +38,50 @@ export default function SignUpForm() {
     INITIAL_STATE
   );
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors: clientErrors },
+    setError,
+    clearErrors,
+  } = useForm<SignUpSchema>({
+    resolver: zodResolver(signUpSchema),
+    mode: "onBlur",
+    defaultValues: {
+      firstname: formState.data?.firstname ?? "",
+      lastname: formState.data?.lastname ?? "",
+      email: formState.data?.email ?? "",
+      password: "",
+    },
+  });
+
+  function onSubmit(data: SignUpSchema) {
+    const formData = new FormData();
+    formData.append("firstname", data.firstname);
+    formData.append("lastname", data.lastname);
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+
+    startTransition(() => {
+      formAction(formData);
+    });
+  }
+
+  useEffect(() => {
+    if (formState.fieldErrors) {
+      Object.entries(formState.fieldErrors).forEach(([field, messages]) => {
+        if (messages && messages[0]) {
+          setError(field as keyof SignUpSchema, {
+            type: "server",
+            message: messages[0].toString(),
+          });
+        }
+      });
+    } else {
+      clearErrors();
+    }
+  }, [formState.fieldErrors, setError, clearErrors]);
+
   useEffect(() => {
     if (formState.message) {
       toast[formState.success ? "success" : "error"](formState.message);
@@ -42,7 +90,7 @@ export default function SignUpForm() {
 
   return (
     <form
-      action={formAction}
+      onSubmit={handleSubmit(onSubmit)}
       noValidate
       className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"
     >
@@ -65,13 +113,15 @@ export default function SignUpForm() {
                 <Input
                   type="text"
                   required
-                  name="firstname"
                   id="firstname"
                   disabled={isPending}
                   defaultValue={formState.data?.firstname ?? ""}
+                  {...register("firstname")}
+                  aria-invalid={!!clientErrors.firstname}
                 />
                 <FieldError>
-                  {formState.fieldErrors?.firstname?.[0]?.toString()}
+                  {clientErrors.firstname?.message ||
+                    formState.fieldErrors?.firstname?.[0]?.toString()}
                 </FieldError>
               </Field>
             </div>
@@ -81,13 +131,15 @@ export default function SignUpForm() {
                 <Input
                   type="text"
                   required
-                  name="lastname"
                   id="lastname"
                   disabled={isPending}
                   defaultValue={formState.data?.lastname ?? ""}
+                  {...register("lastname")}
+                  aria-invalid={!!clientErrors.lastname}
                 />
                 <FieldError>
-                  {formState.fieldErrors?.lastname?.[0]?.toString()}
+                  {clientErrors.lastname?.message ||
+                    formState.fieldErrors?.lastname?.[0]?.toString()}
                 </FieldError>
               </Field>
             </div>
@@ -99,13 +151,15 @@ export default function SignUpForm() {
               <Input
                 type="email"
                 required
-                name="email"
                 id="email"
                 disabled={isPending}
                 defaultValue={formState.data?.email ?? ""}
+                {...register("email")}
+                aria-invalid={!!clientErrors.email}
               />
               <FieldError>
-                {formState.fieldErrors?.email?.[0]?.toString()}
+                {clientErrors.email?.message ||
+                  formState.fieldErrors?.email?.[0]?.toString()}
               </FieldError>
             </Field>
           </div>
@@ -116,18 +170,19 @@ export default function SignUpForm() {
               <Input
                 type="password"
                 required
-                name="password"
                 id="password"
                 disabled={isPending}
                 defaultValue={formState.data?.password ?? ""}
+                {...register("password")}
+                aria-invalid={!!clientErrors.password}
               />
               <FieldError>
-                {formState.fieldErrors?.password?.[0]?.toString()}
+                {clientErrors.password?.message ||
+                  formState.fieldErrors?.password?.[0]?.toString()}
               </FieldError>
             </Field>
           </div>
 
-          {/* <Button className="w-full">Sign Up</Button> */}
           <SubmitButton className="w-full">Sign Up</SubmitButton>
         </div>
 
