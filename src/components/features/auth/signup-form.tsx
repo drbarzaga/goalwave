@@ -19,6 +19,7 @@ import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { signUpSchema } from "@/lib/validations/auth";
+import { authClient } from "@/lib/auth-client";
 
 const INITIAL_STATE: ActionResult<SignUpSchema> = {
   data: {
@@ -54,6 +55,18 @@ export default function SignUpForm() {
       password: "",
     },
   });
+
+  async function handleGoogleSignUp() {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+    } catch (error) {
+      console.error("Google Sign-Up error:", error);
+      toast.error("Failed to sign up with Google.");
+    }
+  }
 
   function onSubmit(data: SignUpSchema) {
     const formData = new FormData();
@@ -195,7 +208,7 @@ export default function SignUpForm() {
         </div>
 
         <div className="grid grid-cols-1 gap-3">
-          <GoogleButton onClick={() => {}} />
+          <GoogleButton onClick={handleGoogleSignUp} />
         </div>
       </div>
 

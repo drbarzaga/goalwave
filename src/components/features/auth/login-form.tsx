@@ -19,6 +19,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SignInSchema } from "@/types/auth";
 import { signInSchema } from "@/lib/validations/auth";
+import { authClient } from "@/lib/auth-client";
 
 const INITIAL_STATE: ActionResult<{ email: string; password: string }> = {
   data: {
@@ -59,6 +60,18 @@ export default function LoginForm() {
     startTransition(() => {
       formAction(formData);
     });
+  }
+
+  async function handleGoogleSignIn() {
+    try {
+      await authClient.signIn.social({
+        provider: "google",
+        callbackURL: "/dashboard",
+      });
+    } catch (error) {
+      console.error("Google Sign-in error:", error);
+      toast.error("Failed to sign in with Google.");
+    }
   }
 
   useEffect(() => {
@@ -140,15 +153,12 @@ export default function LoginForm() {
               <Input
                 type="password"
                 required
-                // name="password"
                 id="password"
                 disabled={isPending}
-                // defaultValue={formState.data?.password ?? ""}
                 {...register("password")}
                 aria-invalid={!!clientErrors.password}
               />
               <FieldError>
-                {/* {formState.fieldErrors?.password?.[0]?.toString()} */}
                 {clientErrors.password?.message ||
                   formState.fieldErrors?.password?.[0]?.toString()}
               </FieldError>
@@ -167,7 +177,7 @@ export default function LoginForm() {
         </div>
 
         <div className="grid grid-cols-1 gap-3">
-          <GoogleButton onClick={() => {}} />
+          <GoogleButton onClick={handleGoogleSignIn} />
         </div>
       </div>
 
