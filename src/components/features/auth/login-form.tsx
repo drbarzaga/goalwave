@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useActionState, useEffect } from "react";
+import React, { startTransition, useActionState, useEffect } from "react";
 import Link from "next/link";
 import { LogoIcon } from "@/components/logo";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,10 @@ import { actions } from "@/actions";
 import { ActionResult } from "@/types/core";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { SignInSchema } from "@/types/auth";
+import { signInSchema } from "@/lib/validations/auth";
 
 const INITIAL_STATE: ActionResult<{ email: string; password: string }> = {
   data: {
@@ -33,6 +37,45 @@ export default function LoginForm() {
     INITIAL_STATE
   );
 
+  const {
+    register,
+    handleSubmit,
+    formState: { errors: clientErrors },
+    setError,
+    clearErrors,
+  } = useForm<SignInSchema>({
+    resolver: zodResolver(signInSchema),
+    mode: "onBlur",
+    defaultValues: {
+      email: formState.data?.email ?? "",
+      password: "",
+    },
+  });
+
+  function onSubmit(data: SignInSchema) {
+    const formData = new FormData();
+    formData.append("email", data.email);
+    formData.append("password", data.password);
+    startTransition(() => {
+      formAction(formData);
+    });
+  }
+
+  useEffect(() => {
+    if (formState.fieldErrors) {
+      Object.entries(formState.fieldErrors).forEach(([field, messages]) => {
+        if (messages && messages[0]) {
+          setError(field as keyof SignInSchema, {
+            type: "server",
+            message: messages[0].toString(),
+          });
+        }
+      });
+    } else {
+      clearErrors();
+    }
+  }, [formState.fieldErrors, setError, clearErrors]);
+
   useEffect(() => {
     if (formState.message) {
       toast[formState.success ? "success" : "error"](formState.message);
@@ -45,7 +88,8 @@ export default function LoginForm() {
 
   return (
     <form
-      action={formAction}
+      // action={formAction}
+      onSubmit={handleSubmit(onSubmit)}
       className="bg-muted m-auto h-fit w-full max-w-sm overflow-hidden rounded-[calc(var(--radius)+.125rem)] border shadow-md shadow-zinc-950/5 dark:[--color-muted:var(--color-zinc-900)]"
       noValidate
     >
@@ -67,13 +111,15 @@ export default function LoginForm() {
               <Input
                 type="email"
                 required
-                name="email"
                 id="email"
                 disabled={isPending}
-                defaultValue={formState.data?.email ?? ""}
+                {...register("email")}
+                aria-invalid={!!clientErrors.email}
               />
               <FieldError>
-                {formState.fieldErrors?.email?.[0]?.toString()}
+                {/* {formState.fieldErrors?.email?.[0]?.toString()} */}
+                {clientErrors.email?.message ||
+                  formState.fieldErrors?.email?.[0]?.toString()}
               </FieldError>
             </Field>
           </div>
@@ -94,13 +140,17 @@ export default function LoginForm() {
               <Input
                 type="password"
                 required
-                name="password"
+                // name="password"
                 id="password"
                 disabled={isPending}
-                defaultValue={formState.data?.password ?? ""}
+                // defaultValue={formState.data?.password ?? ""}
+                {...register("password")}
+                aria-invalid={!!clientErrors.password}
               />
               <FieldError>
-                {formState.fieldErrors?.password?.[0]?.toString()}
+                {/* {formState.fieldErrors?.password?.[0]?.toString()} */}
+                {clientErrors.password?.message ||
+                  formState.fieldErrors?.password?.[0]?.toString()}
               </FieldError>
             </Field>
           </div>

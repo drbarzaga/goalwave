@@ -13,6 +13,15 @@ export const auth = betterAuth({
     provider: "pg",
     schema,
   }),
+  session: {
+    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    updateAge: 60 * 60 * 24, // 1 day
+    cookieSecure: process.env.NODE_ENV === "production",
+    cookieCache: {
+      enabled: true,
+      maxAge: 5 * 60, // 5 minutes for cache
+    },
+  },
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
