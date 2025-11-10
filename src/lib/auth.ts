@@ -4,11 +4,9 @@ import { db } from "@/db";
 import { schema } from "@/db/schema";
 import { nextCookies } from "better-auth/next-js";
 import { lastLoginMethod } from "better-auth/plugins";
-// import { Resend } from "resend";
-// import VerificationEmail from "@/components/emails/verification-email";
-// import PasswordResetEmail from "@/components/emails/password-reset-email";
-
-// const resend = new Resend(process.env.RESEND_API_KEY);
+import { emailService } from "@/services";
+import { getCompanyName } from "./utils";
+import VerificationEmail from "@/components/emails/auth/verification-email";
 
 export const auth = betterAuth({
   database: drizzleAdapter(db, {
@@ -18,33 +16,21 @@ export const auth = betterAuth({
   emailAndPassword: {
     enabled: true,
     requireEmailVerification: true,
-    // sendResetPassword: async ({ user, url }) => {
-    //   await resend.emails.send({
-    //     from: "NoteForge <onboarding@resend.dev>",
-    //     to: [user.email],
-    //     subject: "Reset your password",
-    //     react: PasswordResetEmail({
-    //       userName: user.name,
-    //       userEmail: user.email,
-    //       expirationTime: "1 hour",
-    //       resetUrl: url,
-    //     }),
-    //   });
-    // },
   },
   emailVerification: {
-    // sendVerificationEmail: async ({ user, url }) => {
-    //   await resend.emails.send({
-    //     from: "NoteForge <onboarding@resend.dev>",
-    //     to: [user.email],
-    //     subject: "Verify your email address",
-    //     react: VerificationEmail({
-    //       userName: user.name,
-    //       verificationUrl: url,
-    //     }),
-    //   });
-    // },
     sendOnSignUp: true,
+    autoSignInAfterVerification: true,
+    sendVerificationEmail: async ({ user, url }) => {
+      await emailService.sendEmail({
+        to: user.email,
+        from: `${getCompanyName()} <${process.env.RESEND_FROM_EMAIL || "noreply@goalwave.com"}>`,
+        subject: "Verify your email address",
+        react: VerificationEmail({
+          name: user.name,
+          verificationUrl: url,
+        }),
+      });
+    },
   },
   socialProviders: {
     google: {

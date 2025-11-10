@@ -3,10 +3,11 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { Menu, X } from "lucide-react";
+import { GoalIcon, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ModeToggle from "@/components/shared/mode-toggle";
 import GitHubStarsButton from "@/components/shared/github-stars-button";
+import { authClient } from "@/lib/auth-client";
 
 const menuItems: { name: string; href: string }[] = [
   // { name: "Home", href: "/" },
@@ -16,6 +17,8 @@ const menuItems: { name: string; href: string }[] = [
 
 export default function Header() {
   const [menuState, setMenuState] = useState(false);
+
+  const { data: session } = authClient.useSession();
 
   return (
     <header>
@@ -64,16 +67,29 @@ export default function Header() {
 
               <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit lg:border-l lg:pl-6">
                 <ModeToggle />
-                <Button asChild variant="outline" size="sm">
-                  <Link href="/login">
-                    <span>Login</span>
-                  </Link>
-                </Button>
-                <Button asChild size="sm">
-                  <Link href="/signup">
-                    <span>Signup</span>
-                  </Link>
-                </Button>
+                {session ? (
+                  <Button asChild variant="outline" size="sm">
+                    <Link href="/dashboard">
+                      <span className="flex items-center">
+                        <GoalIcon className="size-4 mr-2" />
+                        Your Dashboard
+                      </span>
+                    </Link>
+                  </Button>
+                ) : (
+                  <>
+                    <Button asChild variant="outline" size="sm">
+                      <Link href="/login">
+                        <span>Login</span>
+                      </Link>
+                    </Button>
+                    <Button asChild size="sm">
+                      <Link href="/signup">
+                        <span>Signup</span>
+                      </Link>
+                    </Button>
+                  </>
+                )}
               </div>
             </div>
           </div>
