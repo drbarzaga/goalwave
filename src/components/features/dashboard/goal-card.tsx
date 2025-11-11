@@ -197,7 +197,7 @@ export default function GoalCard({
                 {Math.round(progress)}%
               </span>
             </div>
-            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+            <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
               <div
                 className={cn(
                   "h-full rounded-full transition-all duration-300",

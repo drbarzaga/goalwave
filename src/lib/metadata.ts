@@ -110,4 +110,12 @@ export const pageMetadata = {
       keywords: ["forgot password", "reset password", "password recovery"],
       noindex: true, // Password reset pages shouldn't be indexed
     }),
+
+  dashboard: (): Metadata =>
+    createPageMetadata({
+      title: "Dashboard",
+      description: `Dashboard of your ${appName} account.`,
+      keywords: ["dashboard", "account"],
+      noindex: true,
+    }),
 };

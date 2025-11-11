@@ -1,6 +1,4 @@
-"use client";
-
-import { cn } from "@/lib/utils";
+import { cn, getCompanyName } from "@/lib/utils";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -79,16 +77,18 @@ export default function SidebarNav() {
   return (
     <Sidebar collapsible="icon" className="border-r border-sidebar-border">
       <SidebarHeader className="border-b border-sidebar-border p-0">
-        <div className={cn(
-          "flex h-14 items-center gap-2",
-          isCollapsed ? "justify-center px-0" : "px-6"
-        )}>
+        <div
+          className={cn(
+            "flex h-14 items-center gap-2",
+            isCollapsed ? "justify-center px-0" : "px-6"
+          )}
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shrink-0">
             <Target className="h-5 w-5 text-primary-foreground" />
           </div>
           {!isCollapsed && (
             <span className="text-xl font-semibold text-sidebar-foreground">
-              Goalwave
+              {getCompanyName()}
             </span>
           )}
         </div>
@@ -114,10 +114,13 @@ export default function SidebarNav() {
                           : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
                       )}
                     >
-                      <Link href={item.href} className={cn(
-                        "flex items-center gap-2",
-                        isCollapsed && "justify-center"
-                      )}>
+                      <Link
+                        href={item.href}
+                        className={cn(
+                          "flex items-center gap-2",
+                          isCollapsed && "justify-center"
+                        )}
+                      >
                         <item.icon className="h-5 w-5" />
                         {!isCollapsed && <span>{item.title}</span>}
                       </Link>
@@ -131,10 +134,7 @@ export default function SidebarNav() {
       </SidebarContent>
 
       <SidebarFooter className="border-t border-sidebar-border p-0">
-        <div className={cn(
-          "flex flex-col gap-2",
-          isCollapsed ? "p-2" : "p-4"
-        )}>
+        <div className={cn("flex flex-col gap-2", isCollapsed ? "p-2" : "p-4")}>
           {!isCollapsed && <NotificationsPanel />}
           <UserMenu isCollapsed={isCollapsed} />
         </div>

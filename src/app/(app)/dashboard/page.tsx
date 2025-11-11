@@ -25,6 +25,7 @@ import { Badge } from "@/components/ui/badge";
 
 import StatsCard from "@/components/features/dashboard/stats-card";
 import GoalCard from "@/components/features/dashboard/goal-card";
+import { pageMetadata } from "@/lib/metadata";
 
 // Datos de ejemplo
 const stats = [
@@ -136,6 +137,8 @@ const achievements = [
   },
 ];
 
+export const metadata = pageMetadata.dashboard();
+
 export default async function DashboardPage() {
   return (
     <div className="container mx-auto px-6 py-8 space-y-8">
@@ -229,7 +232,7 @@ export default async function DashboardPage() {
                     </span>
                     <span className="font-medium">{deadline.progress}%</span>
                   </div>
-                  <Progress value={deadline.progress} className="h-2" />
+                  <Progress value={deadline.progress} className="h-2 w-full" />
                   <p className="text-xs text-muted-foreground">
                     Vence: {deadline.deadline}
                   </p>
@@ -261,21 +264,24 @@ export default async function DashboardPage() {
                 <span className="text-muted-foreground">Ingreso Total</span>
                 <span className="font-semibold">$5,200</span>
               </div>
-              <Progress value={100} className="h-2" />
+              <Progress value={100} className="h-2 w-full" />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Gastos</span>
                 <span className="font-semibold">$3,800</span>
               </div>
-              <Progress value={73} className="h-2" />
+              <Progress value={73} className="h-2 w-full" />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-muted-foreground">Ahorros</span>
                 <span className="font-semibold text-green-500">$1,400</span>
               </div>
-              <Progress value={27} className="h-2 [&>div]:bg-green-500" />
+              <Progress
+                value={27}
+                className="h-2 w-full [&>div]:bg-green-500"
+              />
             </div>
             <div className="pt-4 border-t">
               <Link href="/reports">
@@ -448,23 +454,32 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 transition-all duration-300 hover:shadow-md">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Lightbulb className="h-5 w-5 text-primary" />
+        <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50/50 to-blue-50 dark:from-blue-950/40 dark:via-cyan-950/30 dark:to-blue-950/40 border-blue-200 dark:border-blue-800/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/20">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
+          <CardHeader className="relative">
+            <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-semibold">
+              <div className="p-1.5 rounded-lg bg-blue-500/10 dark:bg-blue-500/20">
+                <Lightbulb className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+              </div>
               Consejo del Día
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-sm leading-relaxed">
-              <strong>Regla 50/30/20:</strong> Destina el 50% de tus ingresos a
-              necesidades básicas, 30% a deseos y gustos, y 20% a ahorros e
-              inversiones. Esta estrategia te ayudará a mantener un balance
-              financiero saludable.
+          <CardContent className="space-y-4 relative">
+            <p className="text-sm leading-relaxed text-foreground">
+              <strong className="text-blue-700 dark:text-blue-300 font-semibold">
+                Regla 50/30/20:
+              </strong>{" "}
+              Destina el 50% de tus ingresos a necesidades básicas, 30% a deseos
+              y gustos, y 20% a ahorros e inversiones. Esta estrategia te
+              ayudará a mantener un balance financiero saludable.
             </p>
             <div className="pt-2">
               <Link href="/tips">
-                <Button variant="outline" size="sm" className="w-full gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="w-full gap-2 border-blue-300 dark:border-blue-700 bg-white/50 dark:bg-blue-950/30 hover:bg-blue-50 dark:hover:bg-blue-900/40 hover:border-blue-400 dark:hover:border-blue-600 text-blue-700 dark:text-blue-300 font-medium transition-all"
+                >
                   Ver Más Consejos
                   <ArrowRight className="h-4 w-4" />
                 </Button>
