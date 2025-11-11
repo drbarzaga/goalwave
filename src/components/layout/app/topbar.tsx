@@ -10,10 +10,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Bell, Sun, Moon } from "lucide-react";
+import { Plus, Bell } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useTheme } from "next-themes";
 import { useState } from "react";
 import {
   Sheet,
@@ -31,14 +30,9 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Notification } from "@/types/notification";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
+import ModeToggle from "@/components/shared/mode-toggle";
 
 const initialNotifications: Notification[] = [
   {
@@ -70,7 +64,6 @@ const initialNotifications: Notification[] = [
 export default function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
-  const { setTheme } = useTheme();
   const { state, isMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [notifications, setNotifications] =
@@ -271,26 +264,7 @@ export default function Topbar() {
             </SheetContent>
           </Sheet>
 
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8">
-                <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-                <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-                <span className="sr-only">Cambiar tema</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem onClick={() => setTheme("light")}>
-                Claro
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("dark")}>
-                Oscuro
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => setTheme("system")}>
-                Sistema
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          <ModeToggle />
 
           <Button
             onClick={() => router.push("/goals/new")}
