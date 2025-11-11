@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
@@ -153,18 +154,18 @@ export default function Topbar() {
           <Breadcrumb>
             <BreadcrumbList>
               {breadcrumbs.map((crumb, index) => (
-                <BreadcrumbItem key={crumb.href}>
-                  {index === breadcrumbs.length - 1 ? (
-                    <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
-                  ) : (
-                    <>
+                <React.Fragment key={crumb.href}>
+                  <BreadcrumbItem>
+                    {index === breadcrumbs.length - 1 ? (
+                      <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                    ) : (
                       <BreadcrumbLink asChild>
                         <Link href={crumb.href}>{crumb.label}</Link>
                       </BreadcrumbLink>
-                      <BreadcrumbSeparator />
-                    </>
-                  )}
-                </BreadcrumbItem>
+                    )}
+                  </BreadcrumbItem>
+                  {index < breadcrumbs.length - 1 && <BreadcrumbSeparator />}
+                </React.Fragment>
               ))}
             </BreadcrumbList>
           </Breadcrumb>
