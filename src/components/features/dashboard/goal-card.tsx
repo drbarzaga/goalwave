@@ -1,0 +1,229 @@
+import {
+  Calendar,
+  DollarSign,
+  Heart,
+  Laptop,
+  ShoppingBag,
+  Home,
+  Plane,
+  GraduationCap,
+  ArrowRight,
+  CheckCircle2,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import React from "react";
+
+interface GoalCardProps {
+  id: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  category: string;
+}
+
+const iconStyles = {
+  blue: "bg-blue-500/10 text-blue-500",
+  green: "bg-green-500/10 text-green-500",
+  purple: "bg-purple-500/10 text-purple-500",
+  orange: "bg-orange-500/10 text-orange-500",
+  pink: "bg-pink-500/10 text-pink-500",
+  yellow: "bg-yellow-500/10 text-yellow-500",
+  red: "bg-red-500/10 text-red-500",
+  indigo: "bg-indigo-500/10 text-indigo-500",
+};
+
+const statusConfig = {
+  completed: {
+    bg: "bg-green-500/10",
+    class: "text-green-600 dark:text-green-400",
+    icon: CheckCircle2,
+  },
+  "in-progress": {
+    bg: "bg-blue-500/10",
+    class: "text-blue-600 dark:text-blue-400",
+    icon: Clock,
+  },
+  pending: {
+    bg: "bg-yellow-500/10",
+    class: "text-yellow-600 dark:text-yellow-400",
+    icon: AlertCircle,
+  },
+};
+
+function CategoryIcon({
+  category,
+  className,
+}: {
+  category: string;
+  className?: string;
+}) {
+  const categoryLower = category.toLowerCase();
+  if (categoryLower.includes("vivienda") || categoryLower.includes("casa"))
+    return <Home className={className} />;
+  if (categoryLower.includes("viaje") || categoryLower.includes("vacacion"))
+    return <Plane className={className} />;
+  if (
+    categoryLower.includes("tecnolog") ||
+    categoryLower.includes("laptop") ||
+    categoryLower.includes("computadora")
+  )
+    return <Laptop className={className} />;
+  if (categoryLower.includes("educac") || categoryLower.includes("curso"))
+    return <GraduationCap className={className} />;
+  if (
+    categoryLower.includes("salud") ||
+    categoryLower.includes("emergencia") ||
+    categoryLower.includes("seguridad")
+  )
+    return <Heart className={className} />;
+  if (categoryLower.includes("compra"))
+    return <ShoppingBag className={className} />;
+  return <DollarSign className={className} />;
+}
+
+function getIconStyle(category: string): keyof typeof iconStyles {
+  const categoryLower = category.toLowerCase();
+  if (categoryLower.includes("vivienda") || categoryLower.includes("casa"))
+    return "blue";
+  if (categoryLower.includes("viaje") || categoryLower.includes("vacacion"))
+    return "purple";
+  if (
+    categoryLower.includes("tecnolog") ||
+    categoryLower.includes("laptop") ||
+    categoryLower.includes("computadora")
+  )
+    return "indigo";
+  if (categoryLower.includes("educac") || categoryLower.includes("curso"))
+    return "green";
+  if (
+    categoryLower.includes("salud") ||
+    categoryLower.includes("emergencia") ||
+    categoryLower.includes("seguridad")
+  )
+    return "red";
+  if (categoryLower.includes("compra")) return "orange";
+  return "blue";
+}
+
+function getStatus(progress: number): keyof typeof statusConfig {
+  if (progress >= 100) return "completed";
+  if (progress > 0) return "in-progress";
+  return "pending";
+}
+
+export default function GoalCard({
+  id,
+  title,
+  targetAmount,
+  currentAmount,
+  deadline,
+  category,
+}: GoalCardProps) {
+  const progress = Math.min((currentAmount / targetAmount) * 100, 100);
+  const status = getStatus(progress);
+  const iconStyle = getIconStyle(category);
+  const formattedAmount = `$${targetAmount.toLocaleString()}`;
+
+  return (
+    <div
+      key={id}
+      className={cn(
+        "flex flex-col",
+        "w-[280px] shrink-0",
+        "bg-card",
+        "rounded-xl",
+        "border border-border",
+        "hover:border-border/80",
+        "transition-all duration-200",
+        "shadow-sm backdrop-blur-xl"
+      )}
+    >
+      <div className="p-4 space-y-3">
+        <div className="flex items-start justify-between">
+          <div className={cn("p-2 rounded-lg", iconStyles[iconStyle])}>
+            <CategoryIcon category={category} className="w-4 h-4" />
+          </div>
+          <div
+            className={cn(
+              "px-2 py-1 rounded-full text-xs font-medium flex items-center gap-1.5",
+              statusConfig[status].bg,
+              statusConfig[status].class
+            )}
+          >
+            {React.createElement(statusConfig[status].icon, {
+              className: "w-3.5 h-3.5",
+            })}
+            {status === "completed"
+              ? "Completada"
+              : status === "in-progress"
+                ? "En progreso"
+                : "Pendiente"}
+          </div>
+        </div>
+
+        <div>
+          <h3 className="text-sm font-medium text-card-foreground mb-1">
+            {title}
+          </h3>
+          <p className="text-xs text-muted-foreground line-clamp-2">
+            {category}
+          </p>
+        </div>
+
+        {typeof progress === "number" && (
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-muted-foreground">Progress</span>
+              <span className="text-card-foreground">
+                {Math.round(progress)}%
+              </span>
+            </div>
+            <div className="h-1.5 bg-muted rounded-full overflow-hidden">
+              <div
+                className="h-full bg-primary rounded-full transition-all duration-300"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+          </div>
+        )}
+
+        {formattedAmount && (
+          <div className="flex items-center gap-1.5">
+            <span className="text-sm font-medium text-card-foreground">
+              {formattedAmount}
+            </span>
+            <span className="text-xs text-muted-foreground">target</span>
+          </div>
+        )}
+
+        <div className="flex items-center text-xs text-muted-foreground">
+          <Calendar className="w-3.5 h-3.5 mr-1.5" />
+          <span>{deadline}</span>
+        </div>
+      </div>
+
+      <div className="mt-auto border-t border-border">
+        <Link href={`/goals/${id}`}>
+          <button
+            className={cn(
+              "w-full flex items-center justify-center gap-2",
+              "py-2.5 px-3",
+              "text-xs font-medium",
+              "text-muted-foreground",
+              "hover:text-foreground",
+              "hover:bg-muted",
+              "transition-colors duration-200"
+            )}
+          >
+            View Details
+            <ArrowRight className="w-3.5 h-3.5" />
+          </button>
+        </Link>
+      </div>
+    </div>
+  );
+}
