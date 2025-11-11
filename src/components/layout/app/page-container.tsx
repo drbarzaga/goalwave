@@ -14,7 +14,7 @@ export default function PageContainer({
       <SidebarNav />
       <SidebarInset className="flex flex-col">
         <Topbar />
-        <div className="flex-1 overflow-auto">{children}</div>
+        <div className="flex-1 overflow-auto pt-14">{children}</div>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -37,7 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Notification } from "@/types/notification";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 
 const initialNotifications: Notification[] = [
   {
@@ -70,6 +70,8 @@ export default function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { setTheme } = useTheme();
+  const { state, isMobile } = useSidebar();
+  const isCollapsed = state === "collapsed";
   const [notifications, setNotifications] =
     useState<Notification[]>(initialNotifications);
   const unreadCount = notifications.filter((n) => !n.read).length;
@@ -134,7 +136,16 @@ export default function Topbar() {
   const breadcrumbs = generateBreadcrumbs();
 
   return (
-    <div className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
+    <div
+      className="fixed top-0 right-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-[left] duration-200 md:transition-[left]"
+      style={{
+        left: isMobile
+          ? 0
+          : isCollapsed
+            ? "var(--sidebar-width-icon)"
+            : "var(--sidebar-width)",
+      }}
+    >
       <div className="flex h-14 items-center justify-between px-6">
         <div className="flex items-center gap-4">
           <SidebarTrigger className="h-8 w-8" />
