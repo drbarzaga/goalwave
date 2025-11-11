@@ -9,7 +9,7 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Menu, Plus, Bell, Sun, Moon } from "lucide-react";
+import { Plus, Bell, Sun, Moon } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
@@ -37,11 +37,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Notification } from "@/types/notification";
-
-interface TopbarProps {
-  onToggleSidebar: () => void;
-  isCollapsed: boolean;
-}
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 const initialNotifications: Notification[] = [
   {
@@ -70,7 +66,7 @@ const initialNotifications: Notification[] = [
   },
 ];
 
-export default function Topbar({ onToggleSidebar, isCollapsed }: TopbarProps) {
+export default function Topbar() {
   const pathname = usePathname();
   const router = useRouter();
   const { setTheme } = useTheme();
@@ -138,21 +134,10 @@ export default function Topbar({ onToggleSidebar, isCollapsed }: TopbarProps) {
   const breadcrumbs = generateBreadcrumbs();
 
   return (
-    <div
-      className={`fixed top-0 right-0 z-40 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-300 ${
-        isCollapsed ? "left-16" : "left-64"
-      }`}
-    >
+    <div className="sticky top-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60">
       <div className="flex h-14 items-center justify-between px-6">
         <div className="flex items-center gap-4">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onToggleSidebar}
-            className="h-8 w-8"
-          >
-            <Menu className="h-4 w-4" />
-          </Button>
+          <SidebarTrigger className="h-8 w-8" />
 
           <Breadcrumb>
             <BreadcrumbList>

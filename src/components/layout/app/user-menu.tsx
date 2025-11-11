@@ -40,7 +40,7 @@ export function UserMenu({ isCollapsed = false }: UserMenuProps) {
           isCollapsed && "justify-center"
         )}
       >
-        <Avatar className="h-8 w-8 flex-shrink-0">
+        <Avatar className="h-8 w-8 shrink-0">
           <AvatarImage src="/diverse-user-avatars.png" alt="Usuario" />
           <AvatarFallback className="bg-primary text-primary-foreground">
             JD
