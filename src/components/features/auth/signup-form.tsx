@@ -196,7 +196,9 @@ export default function SignUpForm() {
             </Field>
           </div>
 
-          <SubmitButton className="w-full">Sign Up</SubmitButton>
+          <SubmitButton className="w-full" loading={isPending}>
+            Sign Up
+          </SubmitButton>
         </div>
 
         <div className="my-6 grid grid-cols-[1fr_auto_1fr] items-center gap-3">
