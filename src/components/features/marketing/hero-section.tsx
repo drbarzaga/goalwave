@@ -99,14 +99,14 @@ export default function HeroSection() {
             <div className="mask-b-from-55% relative mx-auto mt-16 max-w-6xl overflow-hidden px-4">
               <Image
                 className="z-2 border-border/25 relative hidden rounded-2xl border dark:block"
-                src="/music.png"
+                src="/dark.png"
                 alt="app screen"
                 width={2796}
                 height={2008}
               />
               <Image
                 className="z-2 border-border/25 relative rounded-2xl border dark:hidden"
-                src="/music-light.png"
+                src="/light.png"
                 alt="app screen"
                 width={2796}
                 height={2008}
