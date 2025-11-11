@@ -133,13 +133,14 @@ export default function GoalCard({
       key={id}
       className={cn(
         "flex flex-col",
-        "w-[280px] shrink-0",
+        "w-full",
         "bg-card",
         "rounded-xl",
         "border border-border",
         "hover:border-border/80",
         "transition-all duration-200",
-        "shadow-sm backdrop-blur-xl"
+        "shadow-sm backdrop-blur-xl",
+        "h-full"
       )}
     >
       <div className="p-4 space-y-3">
