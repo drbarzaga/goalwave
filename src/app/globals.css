@@ -120,3 +120,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  /* Simple bell animation - subtle wiggle */
+  @keyframes bell-gentle {
+    0%, 100% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-5deg);
+    }
+    75% {
+      transform: rotate(5deg);
+    }
+  }
+
+  .animate-bell-gentle {
+    animation: bell-gentle 2s ease-in-out infinite;
+  }
+}

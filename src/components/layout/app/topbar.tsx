@@ -174,10 +174,19 @@ export default function Topbar() {
         <div className="flex items-center gap-3">
           <Sheet>
             <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="h-8 w-8 relative">
-                <Bell className="h-4 w-4" />
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8 relative transition-all duration-300 hover:bg-accent/80"
+              >
+                <Bell
+                  className={cn(
+                    "h-4 w-4 transition-transform duration-300",
+                    unreadCount > 0 && "animate-bell-gentle"
+                  )}
+                />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-medium text-white flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-destructive text-[10px] font-medium text-white flex items-center justify-center z-10 shadow-lg animate-pulse">
                     {unreadCount}
                   </span>
                 )}

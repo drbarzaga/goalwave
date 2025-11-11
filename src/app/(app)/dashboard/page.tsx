@@ -152,7 +152,11 @@ export default async function DashboardPage() {
             const Icon = action.icon;
             return (
               <Link key={action.label} href={action.href}>
-                <Button size="sm" variant="outline" className="gap-2">
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="gap-2 transition-all duration-300 hover:scale-105 hover:shadow-sm"
+                >
                   <Icon className="h-4 w-4" />
                   {action.label}
                 </Button>
@@ -172,7 +176,7 @@ export default async function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid gap-6 lg:grid-cols-3">
         {/* Metas Recientes - 2/3 width */}
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
@@ -197,7 +201,7 @@ export default async function DashboardPage() {
         </Card>
 
         {/* Próximos Vencimientos */}
-        <Card>
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Clock className="h-5 w-5 text-primary" />
@@ -244,7 +248,7 @@ export default async function DashboardPage() {
 
       {/* Second Row: Resumen, Actividades y Logros */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card>
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <TrendingUp className="h-5 w-5 text-primary" />
@@ -284,7 +288,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Calendar className="h-5 w-5 text-primary" />
@@ -322,10 +326,10 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-amber-500/10 to-orange-500/5 border-amber-500/20">
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-amber-600 dark:text-amber-500" />
+              <Trophy className="h-5 w-5 text-primary" />
               Logros Recientes
             </CardTitle>
           </CardHeader>
@@ -335,7 +339,7 @@ export default async function DashboardPage() {
               return (
                 <div
                   key={index}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-background/50 border border-amber-500/20"
+                  className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
                 >
                   <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
                     <Icon className="h-4 w-4 text-amber-600 dark:text-amber-500" />
@@ -358,7 +362,7 @@ export default async function DashboardPage() {
 
       {/* Bottom Row: Actividad Reciente y Consejo */}
       <div className="grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
+        <Card className="lg:col-span-2 transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="h-5 w-5 text-primary" />
@@ -444,7 +448,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20 transition-all duration-300 hover:shadow-md">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lightbulb className="h-5 w-5 text-primary" />

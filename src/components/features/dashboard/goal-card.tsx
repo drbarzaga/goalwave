@@ -115,6 +115,20 @@ function getStatus(progress: number): keyof typeof statusConfig {
   return "pending";
 }
 
+function getProgressColor(progress: number): string {
+  if (progress >= 100) {
+    return "bg-green-500";
+  } else if (progress >= 75) {
+    return "bg-emerald-500";
+  } else if (progress >= 50) {
+    return "bg-blue-500";
+  } else if (progress >= 25) {
+    return "bg-amber-500";
+  } else {
+    return "bg-orange-500";
+  }
+}
+
 export default function GoalCard({
   id,
   title,
@@ -185,7 +199,10 @@ export default function GoalCard({
             </div>
             <div className="h-1.5 bg-muted rounded-full overflow-hidden">
               <div
-                className="h-full bg-primary rounded-full transition-all duration-300"
+                className={cn(
+                  "h-full rounded-full transition-all duration-300",
+                  getProgressColor(progress)
+                )}
                 style={{ width: `${progress}%` }}
               />
             </div>
