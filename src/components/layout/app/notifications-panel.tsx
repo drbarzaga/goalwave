@@ -8,6 +8,7 @@ import {
   Bell,
   CheckCheck,
   Trash2,
+  BellOff,
 } from "lucide-react";
 import { Notification } from "@/types/notification";
 import {
@@ -125,10 +126,14 @@ export default function NotificationsPanel() {
     <Sheet>
       <SheetTrigger asChild>
         <button className="flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-sidebar-foreground/70 transition-colors hover:bg-sidebar-accent hover:text-sidebar-accent-foreground">
-          <Bell className="h-5 w-5" />
+          {unreadCount > 0 ? (
+            <Bell className="h-5 w-5" />
+          ) : (
+            <BellOff className="h-5 w-5" />
+          )}
           Notificaciones
           {unreadCount > 0 && (
-            <Badge variant="secondary" className="ml-auto">
+            <Badge variant="destructive" className="ml-auto">
               {unreadCount}
             </Badge>
           )}
