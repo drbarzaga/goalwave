@@ -43,6 +43,22 @@ Whether you're saving for a dream vacation, planning for retirement, or working 
 - 🔔 **Dashboard with progress alerts and tips**
 - 🗃️ **History and analysis of achievements**
 
+## 📸 Preview
+
+<div align="center">
+
+### Light Mode
+
+![Goalwave Light Mode](./public/light.png)
+
+### Dark Mode
+
+![Goalwave Dark Mode](./public/dark.png)
+
+</div>
+
+---
+
 ## 🤝 Contributing
 
 We welcome contributions! For detailed information on installation, development setup, database configuration, and the contribution process, please see our [Contributing Guide](./CONTRIBUTING.md).
