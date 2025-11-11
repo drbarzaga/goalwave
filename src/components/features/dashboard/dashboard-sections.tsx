@@ -19,7 +19,7 @@ import { Progress } from "@/components/ui/progress";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import StatsCard from "@/components/features/dashboard/stats-card";
-import GoalCard from "@/components/features/dashboard/goal-card";
+import GoalCard from "@/components/shared/goal-card";
 
 // Simular delay de carga
 async function delay(ms: number) {
