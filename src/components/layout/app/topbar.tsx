@@ -99,7 +99,17 @@ export default function Topbar() {
 
   const generateBreadcrumbs = () => {
     const paths = pathname.split("/").filter(Boolean);
-    const breadcrumbs = [{ label: "Dashboard", href: "/" }];
+    const breadcrumbs: Array<{ label: string; href: string }> = [];
+
+    // Si estamos en la página principal, no mostrar breadcrumbs
+    if (pathname === "/" || pathname === "/dashboard") {
+      return breadcrumbs;
+    }
+
+    // Solo agregar Dashboard si hay rutas adicionales
+    if (paths.length > 0) {
+      breadcrumbs.push({ label: "Dashboard", href: "/dashboard" });
+    }
 
     const pathMap: Record<string, string> = {
       goals: "Metas",
