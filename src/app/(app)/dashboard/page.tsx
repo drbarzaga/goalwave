@@ -45,7 +45,7 @@ export const metadata = pageMetadata.dashboard();
 
 export default async function DashboardPage() {
   return (
-    <div className="container mx-auto px-6 py-8 space-y-8">
+    <div className="space-y-8">
       {/* Header con Quick Actions */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
