@@ -28,6 +28,7 @@ import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface UserMenuProps {
   isCollapsed?: boolean;
@@ -49,6 +50,8 @@ export function UserMenu({ isCollapsed = false }: UserMenuProps) {
   const { setTheme } = useTheme();
   const router = useRouter();
   const { data: session, isPending } = authClient.useSession();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
   const user = session?.user;
   const userName = user?.name || "Usuario";
@@ -66,17 +69,29 @@ export function UserMenu({ isCollapsed = false }: UserMenuProps) {
   }
 
   const handleSignOut = async () => {
+    // Cerrar el dropdown inmediatamente
+    setIsDropdownOpen(false);
+
+    // Mostrar feedback visual inmediato
+    setIsSigningOut(true);
+    toast.loading("Cerrando sesión...", { id: "signout" });
+
     try {
       await authClient.signOut();
-      toast.success("Sesión cerrada correctamente");
-      router.push("/");
+      toast.success("Sesión cerrada correctamente", { id: "signout" });
+      // Pequeño delay para que el usuario vea el mensaje de éxito
+      setTimeout(() => {
+        router.push("/");
+      }, 300);
     } catch (error) {
-      toast.error("Error al cerrar sesión");
+      setIsSigningOut(false);
+      toast.error("Error al cerrar sesión", { id: "signout" });
       console.error("Sign out error:", error);
     }
   };
 
-  if (isPending) {
+  // Mostrar skeletons durante la carga inicial o durante el cierre de sesión
+  if (isPending || isSigningOut) {
     return (
       <div
         className={cn(
@@ -98,12 +113,14 @@ export function UserMenu({ isCollapsed = false }: UserMenuProps) {
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
       <DropdownMenuTrigger
         className={cn(
           "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors hover:bg-muted focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
-          isCollapsed && "justify-center"
+          isCollapsed && "justify-center",
+          isSigningOut && "opacity-50 cursor-not-allowed"
         )}
+        disabled={isSigningOut}
       >
         <Avatar className="h-8 w-8 shrink-0">
           <AvatarImage
@@ -173,11 +190,19 @@ export function UserMenu({ isCollapsed = false }: UserMenuProps) {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="cursor-pointer text-destructive focus:text-destructive"
+          className={cn(
+            "cursor-pointer text-destructive focus:text-destructive",
+            isSigningOut && "opacity-50 cursor-not-allowed"
+          )}
           onClick={handleSignOut}
+          disabled={isSigningOut}
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          Cerrar sesión
+          {isSigningOut ? (
+            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+          ) : (
+            <LogOut className="mr-2 h-4 w-4" />
+          )}
+          {isSigningOut ? "Cerrando sesión..." : "Cerrar sesión"}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
