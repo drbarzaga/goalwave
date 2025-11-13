@@ -7,6 +7,7 @@ import { GoalIcon, Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ModeToggle from "@/components/shared/mode-toggle";
 import GitHubStarsButton from "@/components/shared/github-stars-button";
+import AnimatedCtaButton from "@/components/shared/animated-cta-button";
 import { authClient } from "@/lib/auth-client";
 
 const menuItems: { name: string; href: string }[] = [
@@ -73,14 +74,13 @@ export default function Header() {
                     <div className="h-8 w-16 animate-pulse rounded-md bg-muted" />
                   </div>
                 ) : session ? (
-                  <Button asChild variant="outline" size="sm">
-                    <Link href="/dashboard">
-                      <span className="flex items-center">
-                        <GoalIcon className="size-4 mr-2" />
-                        Go to Dashboard
-                      </span>
-                    </Link>
-                  </Button>
+                  <AnimatedCtaButton
+                    href="/dashboard"
+                    text="Dashboard"
+                    icon={<GoalIcon className="relative size-4" />}
+                    size="sm"
+                    iconOnly
+                  />
                 ) : (
                   <>
                     <Button asChild variant="outline" size="sm">

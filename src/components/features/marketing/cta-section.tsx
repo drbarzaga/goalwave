@@ -1,7 +1,12 @@
+"use client";
+
 import AnimatedCtaButton from "@/components/shared/animated-cta-button";
 import { GoalIcon } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 export default function CallToAction() {
+  const { data: session } = authClient.useSession();
+
   return (
     <section className="py-16 md:py-32">
       <div className="mx-auto max-w-5xl px-6">
@@ -15,8 +20,8 @@ export default function CallToAction() {
 
           <div className="mt-12 flex flex-wrap justify-center gap-4">
             <AnimatedCtaButton
-              href="/signup"
-              text="Start Tracking Goals"
+              href={session ? "/dashboard" : "/signup"}
+              text={session ? "Go to Dashboard" : "Start Tracking Goals"}
               icon={<GoalIcon className="relative size-4 mr-2" />}
             />
           </div>

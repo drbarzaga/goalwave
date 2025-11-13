@@ -8,6 +8,7 @@ import Header from "./header";
 import AnimatedCtaButton from "@/components/shared/animated-cta-button";
 import AnimatedAvatarGroup from "@/components/shared/animated-avatar-group";
 import { GoalIcon } from "lucide-react";
+import { authClient } from "@/lib/auth-client";
 
 const transitionVariants = {
   item: {
@@ -30,6 +31,8 @@ const transitionVariants = {
 };
 
 export default function HeroSection() {
+  const { data: session } = authClient.useSession();
+
   return (
     <>
       <Header />
@@ -86,8 +89,8 @@ export default function HeroSection() {
                       className="bg-foreground/10 rounded-[calc(var(--radius-xl)+0.125rem)] border p-0.5"
                     >
                       <AnimatedCtaButton
-                        href="/signup"
-                        text="Start Tracking Goals"
+                        href={session ? "/dashboard" : "/signup"}
+                        text={session ? "Go to Dashboard" : "Start Tracking Goals"}
                         icon={<GoalIcon className="relative size-4 mr-2" />}
                       />
                     </div>
