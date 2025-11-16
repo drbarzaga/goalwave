@@ -9,8 +9,8 @@ import {
 export const createGoalFormSchema = z.object({
   title: z
     .string()
-    .min(1, "El título es requerido") // Cambiar "nombre" por "título"
-    .max(100, "El título no puede tener más de 100 caracteres"),
+    .min(1, "El nombre es requerido")
+    .max(100, "El nombre no puede tener más de 100 caracteres"),
   description: z
     .string()
     .max(500, "La descripción no puede tener más de 500 caracteres")
@@ -52,22 +52,22 @@ export const createGoalFormSchema = z.object({
 export const createGoalSchema = z.object({
   title: z
     .string()
-    .min(1, "El título es requerido") // Cambiar "nombre" por "título"
-    .max(100, "El título no puede tener más de 100 caracteres"), // Agregar tilde en "más"
+    .min(1, "El nombre es requerido")
+    .max(100, "El nombre no puede tener más de 100 caracteres"),
   description: z
     .string()
-    .max(500, "La descripción no puede tener más de 500 caracteres") // Agregar tilde en "más"
+    .max(500, "La descripción no puede tener más de 500 caracteres")
     .optional()
-    .or(z.literal("")), // Permitir string vacío
+    .or(z.literal("")),
   category: z.enum(GOAL_CATEGORIES_VALUES),
   targetAmount: z
     .string()
     .transform((val) => Number.parseFloat(val))
-    .pipe(z.number().positive("El monto objetivo debe ser mayor a 0")), // Cambiar mensaje
+    .pipe(z.number().positive("El monto objetivo debe ser mayor a 0")),
   currentAmount: z
     .string()
     .transform((val) => Number.parseFloat(val))
-    .pipe(z.number().min(0, "El monto actual no puede ser negativo")), // Cambiar mensaje
+    .pipe(z.number().min(0, "El monto actual no puede ser negativo")),
   targetDate: z.date().optional(),
   priority: z
     .enum(GOAL_PRIORITIES_VALUES, {
