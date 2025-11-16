@@ -12,7 +12,12 @@ import { auth } from "@/lib/auth";
 import { createGoalSchema } from "@/lib/validations/goals";
 import { ActionResult } from "@/types/core";
 import { GoalFormData } from "@/types/goals";
+import { desc, eq } from "drizzle-orm";
 import { headers } from "next/headers";
+import { format } from "date-fns";
+import { es } from "date-fns/locale";
+import { GOAL_CATEGORIES } from "@/lib/constants";
+import type { Goal } from "@/types/goals";
 
 export async function createGoalAction(
   prevState: ActionResult<GoalFormData> | null,
@@ -105,5 +110,58 @@ export async function deleteGoalAction() {
 }
 
 export async function getGoalsAction() {
-  // TODO: Implement the get goals action
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión para ver tus metas",
+      });
+    }
+
+    const goalsData = await db
+      .select()
+      .from(goals)
+      .where(eq(goals.userId, session.user.id))
+      .orderBy(desc(goals.createdAt));
+
+    const transformedGoals: Goal[] = [];
+
+    for (const dbGoal of goalsData) {
+      const status: Goal["status"] = dbGoal.status as Goal["status"];
+
+      const targetAmount = Number.parseFloat(dbGoal.targetAmount) || 0;
+      const currentAmount = Number.parseFloat(dbGoal.currentAmount) || 0;
+
+      let deadline: string;
+      if (dbGoal.targetDate) {
+        deadline = format(dbGoal.targetDate, "d MMM yyyy", { locale: es });
+      } else {
+        deadline = "Sin fecha límite";
+      }
+
+      const categoryConfig = GOAL_CATEGORIES.find(
+        (cat) => cat.value === dbGoal.category
+      );
+      const categoryLabel = categoryConfig?.label || "Otro";
+
+      transformedGoals.push({
+        id: dbGoal.id,
+        title: dbGoal.title,
+        targetAmount,
+        currentAmount,
+        deadline,
+        category: categoryLabel,
+        status,
+      });
+    }
+
+    return createSuccessResult("Metas obtenidas exitosamente", {
+      goals: transformedGoals,
+    });
+  } catch (error) {
+    return handleActionError<Goal[]>(error, []);
+  }
 }

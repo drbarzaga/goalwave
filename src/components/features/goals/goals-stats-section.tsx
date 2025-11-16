@@ -49,7 +49,9 @@ export default function GoalsStatsSection({ stats }: GoalsStatsSectionProps) {
   return (
     <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-foreground">Resumen</h2>
+        <h2 className="text-sm font-semibold text-foreground">
+          Estadísticas de tus metas
+        </h2>
         <button
           onClick={toggleStats}
           className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all duration-200 group"
@@ -57,12 +59,12 @@ export default function GoalsStatsSection({ stats }: GoalsStatsSectionProps) {
           {showStats ? (
             <>
               <EyeOff className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
-              <span>Ocultar</span>
+              <span>Ocultar Estadísticas</span>
             </>
           ) : (
             <>
               <Eye className="h-3.5 w-3.5 transition-transform group-hover:scale-110" />
-              <span>Mostrar</span>
+              <span>Mostrar Estadísticas</span>
             </>
           )}
         </button>

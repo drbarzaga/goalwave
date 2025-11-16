@@ -20,13 +20,13 @@ import {
   Sparkles,
 } from "lucide-react";
 import GoalCard from "@/components/shared/goal-card";
-import type { Goal } from "./goals-sections";
+import type { Goal } from "@/types/goals";
 
 interface GoalsFiltersProps {
-  activeGoals: Goal[];
-  completedGoals: Goal[];
-  allGoals: Goal[];
-  categories: string[];
+  readonly activeGoals: Goal[];
+  readonly completedGoals: Goal[];
+  readonly allGoals: Goal[];
+  readonly categories: string[];
 }
 
 export default function GoalsFilters({
@@ -39,11 +39,9 @@ export default function GoalsFilters({
   const [categoryFilter, setCategoryFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("deadline");
 
-  // Filtrar y ordenar metas
   const getFilteredGoals = (goals: Goal[]) => {
     let filtered = goals;
 
-    // Filtrar por búsqueda
     if (searchQuery) {
       filtered = filtered.filter(
         (g) =>
@@ -52,12 +50,10 @@ export default function GoalsFilters({
       );
     }
 
-    // Filtrar por categoría
     if (categoryFilter !== "all") {
       filtered = filtered.filter((g) => g.category === categoryFilter);
     }
 
-    // Ordenar
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "deadline":
@@ -83,9 +79,15 @@ export default function GoalsFilters({
     <Card className="border-border/50 shadow-sm">
       <CardContent className="p-6">
         <Tabs defaultValue="active" className="space-y-6">
-          {/* Controles superiores */}
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 pb-4 border-b">
             <TabsList className="bg-muted/50">
+              <TabsTrigger
+                value="all"
+                className="data-[state=active]:bg-background"
+              >
+                Todas ({allGoals.length})
+              </TabsTrigger>
+
               <TabsTrigger
                 value="active"
                 className="data-[state=active]:bg-background"
@@ -97,12 +99,6 @@ export default function GoalsFilters({
                 className="data-[state=active]:bg-background"
               >
                 Completadas ({completedGoals.length})
-              </TabsTrigger>
-              <TabsTrigger
-                value="all"
-                className="data-[state=active]:bg-background"
-              >
-                Todas ({allGoals.length})
               </TabsTrigger>
             </TabsList>
 
@@ -150,7 +146,6 @@ export default function GoalsFilters({
             </div>
           </div>
 
-          {/* Contenido de tabs */}
           <TabsContent value="active" className="mt-6 space-y-4">
             {getFilteredGoals(activeGoals).length > 0 ? (
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

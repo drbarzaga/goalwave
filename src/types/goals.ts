@@ -26,3 +26,14 @@ export interface GoalFormData {
 
 // Type for the create goal form data
 export type CreateGoalFormData = z.infer<typeof createGoalFormSchema>;
+
+// Type for a goal in the UI (after transformation from DB)
+export type Goal = {
+  id: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline: string;
+  category: string;
+  status: "active" | "inactive" | "completed" | "cancelled";
+};

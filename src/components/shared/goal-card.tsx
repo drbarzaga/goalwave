@@ -1,12 +1,6 @@
 import {
   Calendar,
   DollarSign,
-  Heart,
-  Laptop,
-  ShoppingBag,
-  Home,
-  Plane,
-  GraduationCap,
   ArrowRight,
   CheckCircle2,
   Clock,
@@ -15,14 +9,15 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
+import { GOAL_CATEGORIES } from "@/lib/constants";
 
 interface GoalCardProps {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  category: string;
+  readonly id: string;
+  readonly title: string;
+  readonly targetAmount: number;
+  readonly currentAmount: number;
+  readonly deadline: string;
+  readonly category: string;
 }
 
 const iconStyles = {
@@ -58,31 +53,27 @@ function CategoryIcon({
   category,
   className,
 }: {
-  category: string;
-  className?: string;
+  readonly category: string;
+  readonly className?: string;
 }) {
-  const categoryLower = category.toLowerCase();
-  if (categoryLower.includes("vivienda") || categoryLower.includes("casa"))
-    return <Home className={className} />;
-  if (categoryLower.includes("viaje") || categoryLower.includes("vacacion"))
-    return <Plane className={className} />;
-  if (
-    categoryLower.includes("tecnolog") ||
-    categoryLower.includes("laptop") ||
-    categoryLower.includes("computadora")
-  )
-    return <Laptop className={className} />;
-  if (categoryLower.includes("educac") || categoryLower.includes("curso"))
-    return <GraduationCap className={className} />;
-  if (
-    categoryLower.includes("salud") ||
-    categoryLower.includes("emergencia") ||
-    categoryLower.includes("seguridad")
-  )
-    return <Heart className={className} />;
-  if (categoryLower.includes("compra"))
-    return <ShoppingBag className={className} />;
+  const categoryConfig = GOAL_CATEGORIES.find((cat) => cat.label === category);
+
+  if (categoryConfig) {
+    const Icon = categoryConfig.icon;
+    return <Icon className={className} />;
+  }
+
   return <DollarSign className={className} />;
+}
+
+function getStatusLabel(status: string): string {
+  if (status === "completed") {
+    return "Completada";
+  }
+  if (status === "in-progress") {
+    return "En progreso";
+  }
+  return "Pendiente";
 }
 
 function getIconStyle(category: string): keyof typeof iconStyles {
@@ -172,11 +163,7 @@ export default function GoalCard({
             {React.createElement(statusConfig[status].icon, {
               className: "w-3.5 h-3.5",
             })}
-            {status === "completed"
-              ? "Completada"
-              : status === "in-progress"
-                ? "En progreso"
-                : "Pendiente"}
+            {getStatusLabel(status)}
           </div>
         </div>
 

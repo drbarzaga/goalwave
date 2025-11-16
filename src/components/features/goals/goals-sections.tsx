@@ -1,20 +1,6 @@
 import GoalsStatsSection from "./goals-stats-section";
 import GoalsFilters from "./goals-filters";
-
-export type Goal = {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  category: string;
-  status: "active" | "completed";
-};
-
-// Delay mínimo para permitir que los skeletons se muestren durante la hidratación
-async function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import type { Goal } from "@/types/goals";
 
 interface StatsData {
   totalTarget: number;
@@ -28,22 +14,20 @@ interface StatsData {
 }
 
 interface GoalsStatsSectionWrapperProps {
-  stats: StatsData;
+  readonly stats: StatsData;
 }
 
 export async function GoalsStatsSectionWrapper({
   stats,
 }: GoalsStatsSectionWrapperProps) {
-  // Delay muy corto solo para permitir que React muestre el skeleton durante la hidratación
-  await delay(50);
   return <GoalsStatsSection stats={stats} />;
 }
 
 interface GoalsFiltersWrapperProps {
-  activeGoals: Goal[];
-  completedGoals: Goal[];
-  allGoals: Goal[];
-  categories: string[];
+  readonly activeGoals: Goal[];
+  readonly completedGoals: Goal[];
+  readonly allGoals: Goal[];
+  readonly categories: string[];
 }
 
 export async function GoalsFiltersWrapper({
@@ -52,8 +36,6 @@ export async function GoalsFiltersWrapper({
   allGoals,
   categories,
 }: GoalsFiltersWrapperProps) {
-  // Delay muy corto solo para permitir que React muestre el skeleton durante la hidratación
-  await delay(50);
   return (
     <GoalsFilters
       activeGoals={activeGoals}
@@ -63,4 +45,3 @@ export async function GoalsFiltersWrapper({
     />
   );
 }
-
