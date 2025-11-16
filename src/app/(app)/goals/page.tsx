@@ -1,6 +1,4 @@
 import React, { Suspense } from "react";
-import { differenceInDays, parse } from "date-fns";
-import { es } from "date-fns/locale";
 import {
   GoalsStatsSectionWrapper,
   GoalsFiltersWrapper,
@@ -11,20 +9,16 @@ import {
   GoalsFiltersSkeleton,
 } from "@/components/features/goals/goals-skeletons";
 import { actions } from "@/actions";
+import {
+  extractGoalsFromResult,
+  getDaysUntilDeadline,
+  calculateProgress,
+} from "@/lib/goals-helpers";
+import { PERCENTAGE_MAX, PERCENTAGE_DEFAULT } from "@/lib/constants";
 
 export default async function GoalsPage() {
   const result = await actions.goals.get();
-
-  let allGoals: Goal[] = [];
-
-  if (
-    result.success &&
-    result.data &&
-    typeof result.data === "object" &&
-    "goals" in result.data
-  ) {
-    allGoals = Array.isArray(result.data.goals) ? result.data.goals : [];
-  }
+  const allGoals = extractGoalsFromResult(result);
 
   // If there are no goals, show the empty state
   if (allGoals.length === 0) {
@@ -77,36 +71,28 @@ export default async function GoalsPage() {
   // Get stats for the goals
   const totalTarget = allGoals.reduce(
     (sum: number, g: Goal) => sum + g.targetAmount,
-    0
+    PERCENTAGE_DEFAULT
   );
   const totalSaved = allGoals.reduce(
     (sum: number, g: Goal) => sum + g.currentAmount,
-    0
+    PERCENTAGE_DEFAULT
   );
-  const totalProgress = totalTarget > 0 ? (totalSaved / totalTarget) * 100 : 0;
+  const totalProgress =
+    totalTarget > PERCENTAGE_DEFAULT
+      ? (totalSaved / totalTarget) * PERCENTAGE_MAX
+      : PERCENTAGE_DEFAULT;
   const remaining = totalTarget - totalSaved;
 
   // Get the average progress of the active goals
   const avgProgress =
     activeGoals.length > 0
       ? activeGoals.reduce((sum: number, g: Goal) => {
-          const progress = (g.currentAmount / g.targetAmount) * 100;
+          const progress = calculateProgress(g.currentAmount, g.targetAmount);
           return sum + progress;
-        }, 0) / activeGoals.length
-      : 0;
+        }, PERCENTAGE_DEFAULT) / activeGoals.length
+      : PERCENTAGE_DEFAULT;
 
   // Get the nearest goal (days until deadline)
-  const getDaysUntilDeadline = (deadlineStr: string): number => {
-    try {
-      // Expected format: "31 Dic 2025" (spanish)
-      const date = parse(deadlineStr, "d MMM yyyy", new Date(), { locale: es });
-      const days = differenceInDays(date, new Date());
-      return days >= 0 ? days : Infinity;
-    } catch {
-      return Infinity;
-    }
-  };
-
   const nearestGoal =
     activeGoals.length > 0
       ? activeGoals.reduce((nearest: Goal, current: Goal) => {

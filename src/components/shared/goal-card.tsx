@@ -9,7 +9,12 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
-import { GOAL_CATEGORIES } from "@/lib/constants";
+import {
+  GOAL_CATEGORIES,
+  PERCENTAGE_DEFAULT,
+  PROGRESS_THRESHOLDS,
+} from "@/lib/constants";
+import { calculateProgress } from "@/lib/goals-helpers";
 
 interface GoalCardProps {
   readonly id: string;
@@ -101,19 +106,19 @@ function getIconStyle(category: string): keyof typeof iconStyles {
 }
 
 function getStatus(progress: number): keyof typeof statusConfig {
-  if (progress >= 100) return "completed";
-  if (progress > 0) return "in-progress";
+  if (progress >= PROGRESS_THRESHOLDS.COMPLETED) return "completed";
+  if (progress > PERCENTAGE_DEFAULT) return "in-progress";
   return "pending";
 }
 
 function getProgressColor(progress: number): string {
-  if (progress >= 100) {
+  if (progress >= PROGRESS_THRESHOLDS.COMPLETED) {
     return "bg-green-500";
-  } else if (progress >= 75) {
+  } else if (progress >= PROGRESS_THRESHOLDS.HIGH) {
     return "bg-emerald-500";
-  } else if (progress >= 50) {
+  } else if (progress >= PROGRESS_THRESHOLDS.MEDIUM) {
     return "bg-blue-500";
-  } else if (progress >= 25) {
+  } else if (progress >= PROGRESS_THRESHOLDS.LOW) {
     return "bg-amber-500";
   } else {
     return "bg-orange-500";
@@ -128,7 +133,7 @@ export default function GoalCard({
   deadline,
   category,
 }: GoalCardProps) {
-  const progress = Math.min((currentAmount / targetAmount) * 100, 100);
+  const progress = calculateProgress(currentAmount, targetAmount);
   const status = getStatus(progress);
   const iconStyle = getIconStyle(category);
   const formattedAmount = `$${targetAmount.toLocaleString()}`;

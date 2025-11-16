@@ -20,42 +20,60 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import StatsCard from "@/components/features/dashboard/stats-card";
 import GoalCard from "@/components/shared/goal-card";
-
-// Simular delay de carga
-async function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
-}
+import { getDashboardStats } from "@/actions/goals";
+import { actions } from "@/actions";
+import {
+  RECENT_GOALS_LIMIT,
+  UPCOMING_DEADLINES_LIMIT,
+  URGENT_DEADLINE_DAYS_THRESHOLD,
+  PERCENTAGE_DEFAULT,
+  DEFAULT_AMOUNT_STRING,
+  NO_DEADLINE_TEXT,
+} from "@/lib/constants";
+import {
+  getDaysUntilDeadline,
+  calculateProgress,
+  extractGoalsFromResult,
+} from "@/lib/goals-helpers";
 
 // Sección de Stats
 export async function StatsSection() {
-  await delay(500); // Simular carga de 500ms
+  const statsData = await getDashboardStats();
 
   const stats = [
     {
       title: "Metas Activas",
-      value: "4",
-      change: "+2 este mes",
+      value: statsData?.activeGoalsCount.toString() || DEFAULT_AMOUNT_STRING,
+      change: "",
       icon: Target,
-      trend: "up" as const,
+      trend: "neutral" as const,
     },
     {
       title: "Total Ahorrado",
-      value: "$12,450",
-      change: "+15% del mes pasado",
+      value: statsData
+        ? `$${statsData.totalSaved.toLocaleString("es-MX", {
+            minimumFractionDigits: PERCENTAGE_DEFAULT,
+            maximumFractionDigits: PERCENTAGE_DEFAULT,
+          })}`
+        : `$${DEFAULT_AMOUNT_STRING}`,
+      change: "",
       icon: DollarSign,
-      trend: "up" as const,
+      trend: "neutral" as const,
     },
     {
       title: "Progreso Promedio",
-      value: "68%",
-      change: "+12% esta semana",
+      value: `${Math.round(statsData?.avgProgress || PERCENTAGE_DEFAULT)}%`,
+      change: "",
       icon: TrendingUp,
-      trend: "up" as const,
+      trend: "neutral" as const,
     },
     {
       title: "Días hasta meta más cercana",
-      value: "45",
-      change: "Vacaciones 2025",
+      value:
+        statsData && statsData.daysUntilNearest !== null
+          ? statsData.daysUntilNearest.toString()
+          : "—",
+      change: statsData?.nearestGoalTitle || "",
       icon: Clock,
       trend: "neutral" as const,
     },
@@ -70,36 +88,11 @@ export async function StatsSection() {
   );
 }
 
-// Sección de Metas Recientes
+// Recent Goals Section
 export async function RecentGoalsSection() {
-  await delay(800); // Simular carga de 800ms
-
-  const recentGoals = [
-    {
-      id: "1",
-      title: "Fondo de Emergencia",
-      targetAmount: 10000,
-      currentAmount: 7500,
-      deadline: "31 Dic 2025",
-      category: "Seguridad Financiera",
-    },
-    {
-      id: "2",
-      title: "Vacaciones Europa",
-      targetAmount: 5000,
-      currentAmount: 3200,
-      deadline: "15 Jun 2025",
-      category: "Viajes",
-    },
-    {
-      id: "3",
-      title: "Nuevo Laptop",
-      targetAmount: 2000,
-      currentAmount: 1750,
-      deadline: "28 Feb 2025",
-      category: "Tecnología",
-    },
-  ];
+  const result = await actions.goals.get();
+  const allGoals = extractGoalsFromResult(result);
+  const recentGoals = allGoals.slice(0, RECENT_GOALS_LIMIT);
 
   return (
     <Card className="lg:col-span-2 transition-all duration-300 hover:shadow-md">
@@ -118,38 +111,42 @@ export async function RecentGoalsSection() {
         </div>
       </CardHeader>
       <CardContent>
-        <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
-          {recentGoals.slice(0, 3).map((goal) => (
-            <GoalCard key={goal.id} {...goal} />
-          ))}
-        </div>
+        {recentGoals.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground text-sm">
+              No tienes metas aún.{" "}
+              <Link href="/goals/new" className="text-primary hover:underline">
+                Crea tu primera meta
+              </Link>
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
+            {recentGoals.map((goal) => (
+              <GoalCard key={goal.id} {...goal} />
+            ))}
+          </div>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-// Sección de Próximos Vencimientos
+// Upcoming Deadlines Section
 export async function UpcomingDeadlinesSection() {
-  await delay(600); // Simular carga de 600ms
+  const result = await actions.goals.get();
+  const allGoals = extractGoalsFromResult(result);
 
-  const upcomingDeadlines = [
-    {
-      id: "1",
-      title: "Nuevo Laptop",
-      deadline: "28 Feb 2025",
-      daysLeft: 45,
-      progress: 88,
-      urgent: false,
-    },
-    {
-      id: "2",
-      title: "Vacaciones Europa",
-      deadline: "15 Jun 2025",
-      daysLeft: 152,
-      progress: 64,
-      urgent: false,
-    },
-  ];
+  const goalsWithDeadlines = allGoals
+    .filter((g) => g.status === "active" && g.deadline !== NO_DEADLINE_TEXT)
+    .map((g) => ({
+      ...g,
+      daysLeft: getDaysUntilDeadline(g.deadline),
+      progress: calculateProgress(g.currentAmount, g.targetAmount),
+    }))
+    .filter((g) => g.daysLeft !== Infinity)
+    .sort((a, b) => a.daysLeft - b.daysLeft)
+    .slice(0, UPCOMING_DEADLINES_LIMIT);
 
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
@@ -160,48 +157,58 @@ export async function UpcomingDeadlinesSection() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {upcomingDeadlines.map((deadline) => (
-          <div
-            key={deadline.id}
-            className="p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
-          >
-            <div className="flex items-start justify-between mb-2">
-              <h4 className="font-medium text-sm">{deadline.title}</h4>
-              {deadline.urgent && (
-                <Badge variant="destructive" className="text-xs">
-                  Urgente
-                </Badge>
-              )}
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between text-xs">
-                <span className="text-muted-foreground">
-                  {deadline.daysLeft} días restantes
-                </span>
-                <span className="font-medium">{deadline.progress}%</span>
-              </div>
-              <Progress value={deadline.progress} className="h-2 w-full" />
-              <p className="text-xs text-muted-foreground">
-                Vence: {deadline.deadline}
-              </p>
-            </div>
+        {goalsWithDeadlines.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-muted-foreground text-sm">
+              No hay vencimientos próximos
+            </p>
           </div>
-        ))}
-        <Link href="/goals">
-          <Button variant="outline" size="sm" className="w-full gap-2">
-            Ver todas las metas
-            <ArrowRight className="h-4 w-4" />
-          </Button>
-        </Link>
+        ) : (
+          <>
+            {goalsWithDeadlines.map((deadline) => (
+              <div
+                key={deadline.id}
+                className="p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors"
+              >
+                <div className="flex items-start justify-between mb-2">
+                  <h4 className="font-medium text-sm">{deadline.title}</h4>
+                  {deadline.daysLeft <= URGENT_DEADLINE_DAYS_THRESHOLD && (
+                    <Badge variant="destructive" className="text-xs">
+                      Urgente
+                    </Badge>
+                  )}
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs">
+                    <span className="text-muted-foreground">
+                      {deadline.daysLeft} días restantes
+                    </span>
+                    <span className="font-medium">
+                      {Math.round(deadline.progress)}%
+                    </span>
+                  </div>
+                  <Progress value={deadline.progress} className="h-2 w-full" />
+                  <p className="text-xs text-muted-foreground">
+                    Vence: {deadline.deadline}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <Link href="/goals">
+              <Button variant="outline" size="sm" className="w-full gap-2">
+                Ver todas las metas
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </>
+        )}
       </CardContent>
     </Card>
   );
 }
 
-// Sección de Resumen Mensual
+// Monthly Summary Section
 export async function MonthlySummarySection() {
-  await delay(700); // Simular carga de 700ms
-
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader>
@@ -245,10 +252,8 @@ export async function MonthlySummarySection() {
   );
 }
 
-// Sección de Actividades de Hoy
+// Today Activities Section
 export async function TodayActivitiesSection() {
-  await delay(400); // Simular carga de 400ms
-
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader>
@@ -290,10 +295,8 @@ export async function TodayActivitiesSection() {
   );
 }
 
-// Sección de Logros Recientes
+// Recent Achievements Section
 export async function RecentAchievementsSection() {
-  await delay(550); // Simular carga de 550ms
-
   const achievements = [
     {
       title: "Primera Meta Completada",
@@ -345,10 +348,8 @@ export async function RecentAchievementsSection() {
   );
 }
 
-// Sección de Actividad Reciente
+// Recent Activity Section
 export async function RecentActivitySection() {
-  await delay(900); // Simular carga de 900ms
-
   const activities = [
     {
       action: "Agregaste",
@@ -440,13 +441,11 @@ export async function RecentActivitySection() {
   );
 }
 
-// Sección de Consejo del Día
+// Daily Tip Section
 export async function DailyTipSection() {
-  await delay(300); // Simular carga de 300ms
-
   return (
-    <Card className="relative overflow-hidden bg-gradient-to-br from-blue-50 via-cyan-50/50 to-blue-50 dark:from-blue-950/40 dark:via-cyan-950/30 dark:to-blue-950/40 border-blue-200 dark:border-blue-800/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/20">
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent pointer-events-none" />
+    <Card className="relative overflow-hidden bg-linear-to-br from-blue-50 via-cyan-50/50 to-blue-50 dark:from-blue-950/40 dark:via-cyan-950/30 dark:to-blue-950/40 border-blue-200 dark:border-blue-800/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/20">
+      <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent pointer-events-none" />
       <CardHeader className="relative">
         <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300 font-semibold">
           <div className="p-1.5 rounded-lg bg-blue-500/10 dark:bg-blue-500/20">

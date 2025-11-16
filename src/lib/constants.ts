@@ -64,6 +64,26 @@ export const GOAL_STATUS_VALUES = [
 
 export const GOAL_TRANSACTION_TYPES_VALUES = ["deposit", "withdrawal"];
 
+// Dashboard and Goals constants
+export const PERCENTAGE_MAX = 100;
+export const PERCENTAGE_DEFAULT = 0;
+export const RECENT_GOALS_LIMIT = 3;
+export const UPCOMING_DEADLINES_LIMIT = 3;
+export const URGENT_DEADLINE_DAYS_THRESHOLD = 7;
+export const MILLISECONDS_PER_DAY = 1000 * 60 * 60 * 24;
+export const DEFAULT_AMOUNT = 0;
+export const DEFAULT_AMOUNT_STRING = "0";
+export const NO_DEADLINE_TEXT = "Sin fecha límite";
+export const DATE_FORMAT_PATTERN = "d MMM yyyy";
+
+// Progress thresholds for goal status colors
+export const PROGRESS_THRESHOLDS = {
+  COMPLETED: PERCENTAGE_MAX,
+  HIGH: 75,
+  MEDIUM: 50,
+  LOW: 25,
+} as const;
+
 export const GOAL_CATEGORIES: GoalCategory[] = [
   {
     value: "emergency",
