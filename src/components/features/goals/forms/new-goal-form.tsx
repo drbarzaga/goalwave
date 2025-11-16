@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,72 +30,22 @@ import {
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import type { Category } from "../new-goal-types";
+import { GOAL_CATEGORIES } from "@/lib/constants";
+import { useNewGoalForm } from "@/components/providers/new-goal-form-provider";
 
-interface NewGoalFormProps {
-  categories: Category[];
-  onFormChange: (data: FormData) => void;
-}
-
-export interface FormData {
-  title: string;
-  description: string;
-  category: string;
-  targetAmount: string;
-  currentAmount: string;
-  date: Date | undefined;
-  priority: string;
-  savingFrequency: string;
-  reminderEnabled: boolean;
-}
-
-export default function NewGoalForm({
-  categories,
-  onFormChange,
-}: NewGoalFormProps) {
+export default function NewGoalForm() {
   const router = useRouter();
-  const [date, setDate] = useState<Date>();
-  const [category, setCategory] = useState<string>("");
-  const [targetAmount, setTargetAmount] = useState<string>("");
-  const [currentAmount, setCurrentAmount] = useState<string>("0");
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
-  const [priority, setPriority] = useState<string>("");
-  const [savingFrequency, setSavingFrequency] = useState<string>("monthly");
-  const [reminderEnabled, setReminderEnabled] = useState<boolean>(false);
-
-  // Notificar cambios al componente padre
-  React.useEffect(() => {
-    onFormChange({
-      title,
-      description,
-      category,
-      targetAmount,
-      currentAmount,
-      date,
-      priority,
-      savingFrequency,
-      reminderEnabled,
-    });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    title,
-    description,
-    category,
-    targetAmount,
-    currentAmount,
-    date,
-    priority,
-    savingFrequency,
-    reminderEnabled,
-  ]);
+  const { formData, updateFormData } = useNewGoalForm();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: Aquí se llamará al Server Action cuando esté listo
     router.push("/goals");
   };
 
-  const selectedCategory = categories.find((cat) => cat.value === category);
+  const selectedCategory = GOAL_CATEGORIES.find(
+    (cat) => cat.value === formData.category
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -105,8 +55,8 @@ export default function NewGoalForm({
           id="title"
           placeholder="Ej: Mi primer auto, Viaje a Europa, Fondo de emergencia..."
           required
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          value={formData.title}
+          onChange={(e) => updateFormData({ title: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
           Dale un nombre que te inspire cada vez que lo veas
@@ -120,8 +70,8 @@ export default function NewGoalForm({
           placeholder="¿Por qué es importante esta meta para ti? Escribe tus motivos..."
           rows={2}
           className="resize-none"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={formData.description}
+          onChange={(e) => updateFormData({ description: e.target.value })}
         />
         <p className="text-xs text-muted-foreground">
           Una descripción clara te ayudará a mantener la motivación
@@ -131,7 +81,11 @@ export default function NewGoalForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="category">Categoría</Label>
-          <Select required value={category} onValueChange={setCategory}>
+          <Select
+            required
+            value={formData.category}
+            onValueChange={(value) => updateFormData({ category: value })}
+          >
             <SelectTrigger
               id="category"
               className="w-full [&_[data-slot=select-value]_svg]:hidden"
@@ -139,17 +93,14 @@ export default function NewGoalForm({
               <div className="flex items-center gap-2 flex-1 min-w-0">
                 {selectedCategory && (
                   <selectedCategory.icon
-                    className={cn(
-                      "h-4 w-4 shrink-0",
-                      selectedCategory.color
-                    )}
+                    className={cn("h-4 w-4 shrink-0", selectedCategory.color)}
                   />
                 )}
                 <SelectValue placeholder="Seleccionar categoría" />
               </div>
             </SelectTrigger>
             <SelectContent>
-              {categories.map((cat) => {
+              {GOAL_CATEGORIES.map((cat) => {
                 const Icon = cat.icon;
                 return (
                   <SelectItem key={cat.value} value={cat.value}>
@@ -181,8 +132,8 @@ export default function NewGoalForm({
               required
               min="1"
               step="0.01"
-              value={targetAmount}
-              onChange={(e) => setTargetAmount(e.target.value)}
+              value={formData.targetAmount}
+              onChange={(e) => updateFormData({ targetAmount: e.target.value })}
             />
           </div>
           <p className="text-xs text-muted-foreground">
@@ -205,8 +156,10 @@ export default function NewGoalForm({
               className="pl-7"
               min="0"
               step="0.01"
-              value={currentAmount}
-              onChange={(e) => setCurrentAmount(e.target.value)}
+              value={formData.currentAmount}
+              onChange={(e) =>
+                updateFormData({ currentAmount: e.target.value })
+              }
             />
           </div>
           <p className="text-xs text-muted-foreground">
@@ -222,20 +175,20 @@ export default function NewGoalForm({
                 variant="outline"
                 className={cn(
                   "w-full justify-start text-left font-normal",
-                  !date && "text-muted-foreground"
+                  !formData.date && "text-muted-foreground"
                 )}
               >
                 <CalendarIcon className="mr-2 h-4 w-4" />
-                {date
-                  ? format(date, "PPP", { locale: es })
+                {formData.date
+                  ? format(formData.date, "PPP", { locale: es })
                   : "Seleccionar fecha"}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="single"
-                selected={date}
-                onSelect={setDate}
+                selected={formData.date}
+                onSelect={(date) => updateFormData({ date })}
                 initialFocus
               />
             </PopoverContent>
@@ -249,7 +202,10 @@ export default function NewGoalForm({
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="priority">Prioridad</Label>
-          <Select value={priority} onValueChange={setPriority}>
+          <Select
+            value={formData.priority}
+            onValueChange={(value) => updateFormData({ priority: value })}
+          >
             <SelectTrigger id="priority" className="w-full">
               <SelectValue placeholder="Seleccionar prioridad" />
             </SelectTrigger>
@@ -282,8 +238,10 @@ export default function NewGoalForm({
         <div className="space-y-2">
           <Label htmlFor="frequency">Frecuencia de Ahorro</Label>
           <Select
-            value={savingFrequency}
-            onValueChange={setSavingFrequency}
+            value={formData.savingFrequency}
+            onValueChange={(value) =>
+              updateFormData({ savingFrequency: value })
+            }
           >
             <SelectTrigger id="frequency" className="w-full">
               <div className="flex items-center gap-2">
@@ -309,8 +267,10 @@ export default function NewGoalForm({
         <input
           type="checkbox"
           id="reminder"
-          checked={reminderEnabled}
-          onChange={(e) => setReminderEnabled(e.target.checked)}
+          checked={formData.reminderEnabled}
+          onChange={(e) =>
+            updateFormData({ reminderEnabled: e.target.checked })
+          }
           className="mt-1 h-4 w-4 rounded border-input accent-primary cursor-pointer"
         />
         <div className="flex-1">
@@ -331,15 +291,10 @@ export default function NewGoalForm({
         <Button type="submit" className="flex-1">
           Crear Meta
         </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.back()}
-        >
+        <Button type="button" variant="outline" onClick={() => router.back()}>
           Cancelar
         </Button>
       </div>
     </form>
   );
 }
-

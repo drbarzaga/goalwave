@@ -1,12 +1,7 @@
 "use client";
 
 import React from "react";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Target,
   CalendarIcon,
@@ -19,19 +14,13 @@ import {
 import { cn } from "@/lib/utils";
 import { format, differenceInDays, differenceInMonths } from "date-fns";
 import { es } from "date-fns/locale";
-import type { Category } from "../new-goal-types";
-import type { FormData } from "./new-goal-form";
+import { GOAL_CATEGORIES } from "@/lib/constants";
+import { useNewGoalForm } from "@/components/providers/new-goal-form-provider";
 
-interface NewGoalPreviewProps {
-  formData: FormData;
-  categories: Category[];
-}
+export default function NewGoalPreview() {
+  const { formData } = useNewGoalForm();
 
-export default function NewGoalPreview({
-  formData,
-  categories,
-}: NewGoalPreviewProps) {
-  const selectedCategory = categories.find(
+  const selectedCategory = GOAL_CATEGORIES.find(
     (cat) => cat.value === formData.category
   );
   const target = Number.parseFloat(formData.targetAmount) || 0;
@@ -67,9 +56,7 @@ export default function NewGoalPreview({
       <CardContent className="space-y-4 min-h-[450px]">
         {/* Meta */}
         <div className="pb-4 border-b">
-          <p className="text-xs font-medium text-muted-foreground mb-2">
-            Meta
-          </p>
+          <p className="text-xs font-medium text-muted-foreground mb-2">Meta</p>
           <p className="text-sm font-medium text-foreground min-h-[20px]">
             {formData.title || (
               <span className="text-muted-foreground">
@@ -160,7 +147,7 @@ export default function NewGoalPreview({
           </div>
           <div className="h-2.5 bg-muted rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-primary to-primary/80 transition-all duration-500 rounded-full"
+              className="h-full bg-linear-to-r from-primary to-primary/80 transition-all duration-500 rounded-full"
               style={{ width: `${target > 0 ? progress : 0}%` }}
             />
           </div>
@@ -241,9 +228,7 @@ export default function NewGoalPreview({
             </div>
           ) : (
             <div className="space-y-1">
-              <p className="text-xl font-semibold text-muted-foreground">
-                $0
-              </p>
+              <p className="text-xl font-semibold text-muted-foreground">$0</p>
               <p className="text-xs text-muted-foreground">
                 {(() => {
                   if (!formData.date) return "Selecciona una fecha límite";
@@ -258,4 +243,3 @@ export default function NewGoalPreview({
     </Card>
   );
 }
-
