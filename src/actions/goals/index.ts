@@ -1,7 +1,7 @@
 "use server";
 
-import { db } from "@/db";
-import { goals } from "@/db/schema";
+import { db, sql } from "@/db";
+import { goals, goalTransactions } from "@/db/schema";
 import {
   createErrorResult,
   createSuccessResult,
@@ -9,7 +9,10 @@ import {
   validateWithSchema,
 } from "@/lib/actions-helpers";
 import { auth } from "@/lib/auth";
-import { createGoalSchema } from "@/lib/validations/goals";
+import {
+  createGoalSchema,
+  createTransactionSchema,
+} from "@/lib/validations/goals";
 import { ActionResult } from "@/types/core";
 import { GoalFormData } from "@/types/goals";
 import { desc, eq } from "drizzle-orm";
@@ -296,5 +299,236 @@ export async function getDashboardStats() {
   } catch (error) {
     console.error("Error getting dashboard stats:", error);
     return null;
+  }
+}
+
+// Wrapper for useActionState (accepts FormData)
+export async function createTransactionFormAction(
+  prevState: ActionResult<{ transactionId: string }> | null,
+  formData: FormData
+): Promise<ActionResult<{ transactionId: string }>> {
+  const goalId = formData.get("goalId") as string;
+  const type = formData.get("type") as "deposit" | "withdrawal";
+  const amount = formData.get("amount") as string;
+  const description = formData.get("description") as string | null;
+
+  if (!goalId || !type || !amount) {
+    return createErrorResult("Validation error", {
+      message: "Faltan campos requeridos",
+    });
+  }
+
+  return createTransactionAction(goalId, {
+    type,
+    amount: Number.parseFloat(amount),
+    description: description || undefined,
+  });
+}
+
+// Original action (can be called directly)
+export async function createTransactionAction(
+  goalId: string,
+  data: {
+    type: "deposit" | "withdrawal";
+    amount: number;
+    description?: string;
+  }
+): Promise<ActionResult<{ transactionId: string }>> {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "You must be logged in to create a transaction",
+      });
+    }
+
+    // Validate input
+    const validation = createTransactionSchema.safeParse({
+      type: data.type,
+      amount: data.amount.toString(),
+      description: data.description,
+    });
+
+    if (!validation.success) {
+      const firstError = validation.error.issues[0];
+      return createErrorResult("Validation error", {
+        message: firstError?.message || "Invalid transaction data",
+      });
+    }
+
+    // Verify goal exists and belongs to user
+    const [goal] = await db.select().from(goals).where(eq(goals.id, goalId));
+
+    if (!goal) {
+      return createErrorResult("Not found", {
+        message: "Goal not found",
+      });
+    }
+
+    if (goal.userId !== session.user.id) {
+      return createErrorResult("Forbidden", {
+        message: "You don't have permission to modify this goal",
+      });
+    }
+
+    // Check if withdrawal would result in negative balance
+    const currentAmount = Number.parseFloat(goal.currentAmount || "0");
+    const transactionAmount = validation.data.amount;
+
+    if (
+      validation.data.type === "withdrawal" &&
+      currentAmount < transactionAmount
+    ) {
+      return createErrorResult("Insufficient funds", {
+        message: "No tienes suficientes fondos para realizar este retiro",
+      });
+    }
+
+    // Create transaction and update goal atomically
+    // Using sql.transaction() for neon-http driver (non-interactive transaction)
+    const transactionId = crypto.randomUUID();
+    const newAmount =
+      validation.data.type === "deposit"
+        ? currentAmount + transactionAmount
+        : currentAmount - transactionAmount;
+
+    await sql.transaction([
+      // Create transaction record
+      sql`INSERT INTO goal_transactions (id, goal_id, amount, type, description, created_at, updated_at)
+          VALUES (${transactionId}, ${goalId}, ${transactionAmount.toString()}, ${validation.data.type}, ${validation.data.description || null}, NOW(), NOW())`,
+      // Update goal current amount
+      sql`UPDATE goals 
+          SET current_amount = ${newAmount.toString()}, updated_at = NOW()
+          WHERE id = ${goalId}`,
+    ]);
+
+    const result = { transactionId };
+
+    return createSuccessResult("Transaction created successfully", result);
+  } catch (error) {
+    return handleActionError<{ transactionId: string }>(error, {
+      transactionId: "",
+    });
+  }
+}
+
+// Get goal details by ID
+export async function getGoalByIdAction(goalId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión",
+      });
+    }
+
+    const [goalData] = await db
+      .select()
+      .from(goals)
+      .where(eq(goals.id, goalId))
+      .limit(1);
+
+    if (!goalData) {
+      return createErrorResult("Not Found", {
+        message: "Meta no encontrada",
+      });
+    }
+
+    // Verify ownership
+    if (goalData.userId !== session.user.id) {
+      return createErrorResult("Forbidden", {
+        message: "No tienes permiso para ver esta meta",
+      });
+    }
+
+    const targetAmount =
+      Number.parseFloat(goalData.targetAmount) || DEFAULT_AMOUNT;
+    const currentAmount =
+      Number.parseFloat(goalData.currentAmount) || DEFAULT_AMOUNT;
+
+    let deadline: string | undefined;
+    if (goalData.targetDate) {
+      deadline = format(goalData.targetDate, DATE_FORMAT_PATTERN, {
+        locale: es,
+      });
+    }
+
+    return createSuccessResult("Meta obtenida exitosamente", {
+      id: goalData.id,
+      title: goalData.title,
+      description: goalData.description || undefined,
+      category: goalData.category,
+      targetAmount,
+      currentAmount,
+      deadline,
+      createdAt: goalData.createdAt.toISOString(),
+      status: goalData.status,
+    });
+  } catch (error) {
+    return handleActionError<null>(error, null);
+  }
+}
+
+// Get transactions for a goal
+export async function getGoalTransactionsAction(goalId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión",
+      });
+    }
+
+    // Verify goal exists and belongs to user
+    const [goal] = await db
+      .select({ userId: goals.userId })
+      .from(goals)
+      .where(eq(goals.id, goalId))
+      .limit(1);
+
+    if (!goal) {
+      return createErrorResult("Not Found", {
+        message: "Meta no encontrada",
+      });
+    }
+
+    if (goal.userId !== session.user.id) {
+      return createErrorResult("Forbidden", {
+        message: "No tienes permiso para ver las transacciones de esta meta",
+      });
+    }
+
+    const transactionsData = await db
+      .select()
+      .from(goalTransactions)
+      .where(eq(goalTransactions.goalId, goalId))
+      .orderBy(desc(goalTransactions.createdAt));
+
+    const transactions = transactionsData.map((tx) => ({
+      id: tx.id,
+      type: tx.type as "deposit" | "withdrawal",
+      amount: Number.parseFloat(tx.amount) || 0,
+      date: tx.createdAt.toISOString(),
+      description: tx.description || undefined,
+    }));
+
+    return createSuccessResult("Transacciones obtenidas exitosamente", {
+      transactions,
+      total: transactions.length,
+    });
+  } catch (error) {
+    return handleActionError<{ transactions: never[]; total: number }>(error, {
+      transactions: [],
+      total: 0,
+    });
   }
 }

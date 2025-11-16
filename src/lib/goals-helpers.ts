@@ -5,6 +5,7 @@ import {
   DATE_FORMAT_PATTERN,
   NO_DEADLINE_TEXT,
   PERCENTAGE_MAX,
+  PROGRESS_THRESHOLDS,
 } from "@/lib/constants";
 import { actions } from "@/actions";
 
@@ -60,4 +61,23 @@ export function extractGoalsFromResult(
     return Array.isArray(result.data.goals) ? result.data.goals : [];
   }
   return [];
+}
+
+/**
+ * Gets the color class for progress bar based on progress percentage
+ * @param progress - Progress percentage (0-100)
+ * @returns Tailwind CSS color class
+ */
+export function getProgressColor(progress: number): string {
+  if (progress >= PROGRESS_THRESHOLDS.COMPLETED) {
+    return "bg-green-500";
+  } else if (progress >= PROGRESS_THRESHOLDS.HIGH) {
+    return "bg-emerald-500";
+  } else if (progress >= PROGRESS_THRESHOLDS.MEDIUM) {
+    return "bg-blue-500";
+  } else if (progress >= PROGRESS_THRESHOLDS.LOW) {
+    return "bg-amber-500";
+  } else {
+    return "bg-orange-500";
+  }
 }

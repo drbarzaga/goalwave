@@ -11,6 +11,10 @@ import {
   deleteGoalAction,
   getGoalsAction,
   getGoalTitleAction,
+  createTransactionAction,
+  createTransactionFormAction,
+  getGoalByIdAction,
+  getGoalTransactionsAction,
 } from "./goals";
 
 export const actions = {
@@ -26,5 +30,9 @@ export const actions = {
     delete: deleteGoalAction,
     get: getGoalsAction,
     getTitle: getGoalTitleAction,
+    getById: getGoalByIdAction,
+    getTransactions: getGoalTransactionsAction,
+    createTransaction: createTransactionAction,
+    createTransactionForm: createTransactionFormAction,
   },
 };
