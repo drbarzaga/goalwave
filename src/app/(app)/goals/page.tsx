@@ -1,18 +1,15 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { differenceInDays, parse } from "date-fns";
 import { es } from "date-fns/locale";
-import GoalsStatsSection from "@/components/features/goals/goals-stats-section";
-import GoalsFilters from "@/components/features/goals/goals-filters";
-
-type Goal = {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  category: string;
-  status: "active" | "completed";
-};
+import {
+  GoalsStatsSectionWrapper,
+  GoalsFiltersWrapper,
+  type Goal,
+} from "@/components/features/goals/goals-sections";
+import {
+  GoalsStatsSkeleton,
+  GoalsFiltersSkeleton,
+} from "@/components/features/goals/goals-skeletons";
 
 const allGoals: Goal[] = [
   {
@@ -121,26 +118,30 @@ export default function GoalsPage() {
       </div>
 
       {/* Estadísticas con toggle */}
-      <GoalsStatsSection
-        stats={{
-          totalTarget,
-          totalSaved,
-          remaining,
-          totalProgress,
-          activeGoalsCount: activeGoals.length,
-          completedGoalsCount: completedGoals.length,
-          avgProgress,
-          daysUntilNearest,
-        }}
-      />
+      <Suspense fallback={<GoalsStatsSkeleton />}>
+        <GoalsStatsSectionWrapper
+          stats={{
+            totalTarget,
+            totalSaved,
+            remaining,
+            totalProgress,
+            activeGoalsCount: activeGoals.length,
+            completedGoalsCount: completedGoals.length,
+            avgProgress,
+            daysUntilNearest,
+          }}
+        />
+      </Suspense>
 
       {/* Contenedor principal con borde */}
-      <GoalsFilters
-        activeGoals={activeGoals}
-        completedGoals={completedGoals}
-        allGoals={allGoals}
-        categories={categories}
-      />
+      <Suspense fallback={<GoalsFiltersSkeleton />}>
+        <GoalsFiltersWrapper
+          activeGoals={activeGoals}
+          completedGoals={completedGoals}
+          allGoals={allGoals}
+          categories={categories}
+        />
+      </Suspense>
     </div>
   );
 }

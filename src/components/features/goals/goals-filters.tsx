@@ -13,16 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Filter, ArrowUpDown, Target, CheckCircle2, Sparkles } from "lucide-react";
 import GoalCard from "@/components/shared/goal-card";
-
-interface Goal {
-  id: string;
-  title: string;
-  targetAmount: number;
-  currentAmount: number;
-  deadline: string;
-  category: string;
-  status: "active" | "completed";
-}
+import type { Goal } from "./goals-sections";
 
 interface GoalsFiltersProps {
   activeGoals: Goal[];
