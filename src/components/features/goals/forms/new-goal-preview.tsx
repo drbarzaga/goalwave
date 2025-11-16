@@ -28,22 +28,56 @@ export default function NewGoalPreview() {
   const remaining = Math.max(0, target - current);
   const progress = target > 0 ? Math.min((current / target) * 100, 100) : 0;
 
-  // Calcular tiempo estimado
-  let monthlyNeeded: number | null = null;
-  if (formData.date && target > 0 && remaining > 0) {
-    const daysRemaining = differenceInDays(formData.date, new Date());
-    const monthsRemaining = differenceInMonths(formData.date, new Date());
-    if (daysRemaining > 0) {
-      monthlyNeeded = remaining / Math.max(monthsRemaining, 1);
-    }
-  }
-
   const frequencyMap: Record<string, string> = {
     daily: "Diario",
     weekly: "Semanal",
     biweekly: "Quincenal",
     monthly: "Mensual",
+    custom: "Personalizado",
   };
+
+  // Calcular monto necesario según la frecuencia de ahorro
+  let amountNeeded: number | null = null;
+  let frequencyLabel = "";
+  
+  if (formData.date && target > 0 && remaining > 0 && formData.savingFrequency) {
+    const daysRemaining = differenceInDays(formData.date, new Date());
+    const monthsRemaining = differenceInMonths(formData.date, new Date());
+    
+    if (daysRemaining > 0) {
+      const months = Math.max(monthsRemaining, 1);
+      const weeks = Math.ceil(daysRemaining / 7);
+      const biweeks = Math.ceil(daysRemaining / 14);
+      const days = daysRemaining;
+
+      switch (formData.savingFrequency) {
+        case "daily":
+          amountNeeded = remaining / days;
+          frequencyLabel = "por día";
+          break;
+        case "weekly":
+          amountNeeded = remaining / weeks;
+          frequencyLabel = "por semana";
+          break;
+        case "biweekly":
+          amountNeeded = remaining / biweeks;
+          frequencyLabel = "cada quincena";
+          break;
+        case "monthly":
+          amountNeeded = remaining / months;
+          frequencyLabel = "por mes";
+          break;
+        case "custom":
+          // Para frecuencia personalizada, mostramos el cálculo mensual como referencia
+          amountNeeded = remaining / months;
+          frequencyLabel = "por mes (referencia)";
+          break;
+        default:
+          amountNeeded = remaining / months;
+          frequencyLabel = "por mes";
+      }
+    }
+  }
 
   return (
     <Card className="flex-1">
@@ -200,28 +234,41 @@ export default function NewGoalPreview() {
           </div>
         )}
 
-        {/* Ahorro mensual */}
+        {/* Ahorro según frecuencia */}
         <div>
           <p className="text-xs font-medium text-muted-foreground mb-2">
-            Ahorro mensual necesario
+            Ahorro {frequencyLabel || "necesario"}
           </p>
-          {formData.date && target > 0 && remaining > 0 && monthlyNeeded ? (
+          {formData.date && target > 0 && remaining > 0 && amountNeeded && formData.savingFrequency ? (
             <div className="space-y-1">
               <p className="text-xl font-semibold text-primary">
                 $
-                {monthlyNeeded.toLocaleString(undefined, {
+                {amountNeeded.toLocaleString(undefined, {
                   maximumFractionDigits: 2,
                 })}
               </p>
               <p className="text-xs text-muted-foreground">
-                Para alcanzar tu meta el{" "}
-                {format(formData.date, "d 'de' MMMM, yyyy", { locale: es })}
+                {formData.savingFrequency === "custom" ? (
+                  <>Calculado como referencia mensual para alcanzar tu meta el{" "}
+                  {format(formData.date, "d 'de' MMMM, yyyy", { locale: es })}</>
+                ) : (
+                  <>Ahorra {frequencyLabel} para alcanzar tu meta el{" "}
+                  {format(formData.date, "d 'de' MMMM, yyyy", { locale: es })}</>
+                )}
               </p>
+              {formData.savingFrequency && formData.savingFrequency !== "monthly" && (
+                <div className="mt-2 flex items-center gap-2">
+                  <Repeat className="h-3.5 w-3.5 text-muted-foreground" />
+                  <p className="text-xs text-muted-foreground">
+                    Frecuencia: {frequencyMap[formData.savingFrequency] || "Personalizado"}
+                  </p>
+                </div>
+              )}
               {formData.reminderEnabled && (
                 <div className="flex items-center gap-1.5 mt-3 pt-3 border-t">
                   <Bell className="h-3.5 w-3.5 text-primary" />
                   <p className="text-xs text-muted-foreground">
-                    Recordatorios activados
+                    Recibirás notificaciones para mantenerte al día con tu meta
                   </p>
                 </div>
               )}
@@ -233,6 +280,7 @@ export default function NewGoalPreview() {
                 {(() => {
                   if (!formData.date) return "Selecciona una fecha límite";
                   if (target === 0) return "Ingresa un monto objetivo";
+                  if (!formData.savingFrequency) return "Selecciona una frecuencia de ahorro";
                   return "Completa los datos necesarios";
                 })()}
               </p>

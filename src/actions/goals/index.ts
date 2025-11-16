@@ -47,10 +47,11 @@ export async function createGoalAction(
     reminderEnabled: formData.get("reminderEnabled") === "on",
   };
 
-  console.log(`Raw data: ${JSON.stringify(rawData, null, 2)}`);
-
   try {
-    const validation = validateWithSchema(createGoalSchema, rawData);
+    const validation = validateWithSchema(createGoalSchema, {
+      ...rawData,
+      targetDate: date,
+    });
 
     if (!validation.success) {
       return createErrorResult("Invalid form data", {

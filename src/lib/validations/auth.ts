@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH } from "../constants";
 
+// Client-side validation schema for sign in
 export const signInSchema = z.object({
   email: z
     .string()
@@ -14,6 +15,7 @@ export const signInSchema = z.object({
     }),
 });
 
+// Client-side validation schema for sign up
 export const signUpSchema = z.object({
   firstname: z
     .string({ message: "First name is required" })
@@ -38,12 +40,14 @@ export const signUpSchema = z.object({
     }),
 });
 
+// Client-side validation schema for forgot password
 export const forgotPasswordSchema = z.object({
   email: z
     .email({ message: "Invalid email address" })
     .min(1, { message: "Email is required" }),
 });
 
+// Client-side validation schema for reset password
 export const resetPasswordSchema = z
   .object({
     password: z

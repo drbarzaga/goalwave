@@ -1,5 +1,8 @@
+import { createGoalFormSchema } from "@/lib/validations/goals";
 import { LucideIcon } from "lucide-react";
+import z from "zod";
 
+// Type for the goal category
 export interface GoalCategory {
   value: string;
   label: string;
@@ -8,6 +11,7 @@ export interface GoalCategory {
   bgColor: string;
 }
 
+// Type for the goal form data
 export interface GoalFormData {
   title: string;
   description: string;
@@ -19,3 +23,6 @@ export interface GoalFormData {
   savingFrequency: string;
   reminderEnabled: boolean;
 }
+
+// Type for the create goal form data
+export type CreateGoalFormData = z.infer<typeof createGoalFormSchema>;

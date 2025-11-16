@@ -5,25 +5,77 @@ import {
   GOAL_SAVING_FREQUENCIES_VALUES,
 } from "../constants";
 
+// Client-side validation schema (accepts strings and transforms them)
+export const createGoalFormSchema = z.object({
+  title: z
+    .string()
+    .min(1, "El título es requerido") // Cambiar "nombre" por "título"
+    .max(100, "El título no puede tener más de 100 caracteres"),
+  description: z
+    .string()
+    .max(500, "La descripción no puede tener más de 500 caracteres")
+    .optional()
+    .or(z.literal("")),
+  category: z.enum(GOAL_CATEGORIES_VALUES, {
+    message: "Debes seleccionar una categoría",
+  }),
+  targetAmount: z
+    .string()
+    .min(1, "El monto objetivo es requerido")
+    .refine(
+      (val) =>
+        !Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) > 0,
+      "El monto objetivo debe ser mayor a 0"
+    ),
+  currentAmount: z
+    .string()
+    .refine(
+      (val) =>
+        val === "" ||
+        (!Number.isNaN(Number.parseFloat(val)) && Number.parseFloat(val) >= 0),
+      "El monto actual no puede ser negativo"
+    ),
+  date: z.date().optional().nullable(),
+  priority: z
+    .enum(GOAL_PRIORITIES_VALUES, {
+      message: "Debes seleccionar una prioridad válida (alta, media o baja)",
+    })
+    .optional()
+    .nullable(),
+  savingFrequency: z.enum(GOAL_SAVING_FREQUENCIES_VALUES, {
+    message: "Debes seleccionar una frecuencia",
+  }),
+  reminderEnabled: z.boolean(),
+});
+
+// Server-side validation schema (uses numbers and dates)
 export const createGoalSchema = z.object({
   title: z
     .string()
-    .min(1, "El titulo es requerido")
-    .max(100, "El titulo no puede tener mas de 100 caracteres"),
+    .min(1, "El título es requerido") // Cambiar "nombre" por "título"
+    .max(100, "El título no puede tener más de 100 caracteres"), // Agregar tilde en "más"
   description: z
     .string()
-    .max(500, "La descripcion no puede tener mas de 500 caracteres"),
+    .max(500, "La descripción no puede tener más de 500 caracteres") // Agregar tilde en "más"
+    .optional()
+    .or(z.literal("")), // Permitir string vacío
   category: z.enum(GOAL_CATEGORIES_VALUES),
   targetAmount: z
     .string()
     .transform((val) => Number.parseFloat(val))
-    .pipe(z.number().positive("El monto objetivo debe ser mayor a 0")),
+    .pipe(z.number().positive("El monto objetivo debe ser mayor a 0")), // Cambiar mensaje
   currentAmount: z
     .string()
     .transform((val) => Number.parseFloat(val))
-    .pipe(z.number().min(0, "El monto actual no puede ser negativo")),
+    .pipe(z.number().min(0, "El monto actual no puede ser negativo")), // Cambiar mensaje
   targetDate: z.date().optional(),
-  priority: z.enum(GOAL_PRIORITIES_VALUES).optional(),
-  savingFrequency: z.enum(GOAL_SAVING_FREQUENCIES_VALUES),
+  priority: z
+    .enum(GOAL_PRIORITIES_VALUES, {
+      message: "Debes seleccionar una prioridad válida (alta, media o baja)",
+    })
+    .optional(),
+  savingFrequency: z.enum(GOAL_SAVING_FREQUENCIES_VALUES, {
+    message: "Debes seleccionar una frecuencia",
+  }),
   reminderEnabled: z.boolean(),
 });
