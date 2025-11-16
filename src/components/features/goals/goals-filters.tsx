@@ -11,7 +11,14 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, Filter, ArrowUpDown, Target, CheckCircle2, Sparkles } from "lucide-react";
+import {
+  Search,
+  Filter,
+  ArrowUpDown,
+  Target,
+  CheckCircle2,
+  Sparkles,
+} from "lucide-react";
 import GoalCard from "@/components/shared/goal-card";
 import type { Goal } from "./goals-sections";
 
@@ -110,10 +117,7 @@ export default function GoalsFilters({
                 />
               </div>
 
-              <Select
-                value={categoryFilter}
-                onValueChange={setCategoryFilter}
-              >
+              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="h-9 w-[200px] bg-background">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <Filter className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
@@ -223,4 +227,3 @@ export default function GoalsFilters({
     </Card>
   );
 }
-
