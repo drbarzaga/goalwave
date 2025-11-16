@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import { Plus, DollarSign, BarChart3, Lightbulb } from "lucide-react";
+import { DollarSign, BarChart3, Lightbulb } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { pageMetadata } from "@/lib/metadata";
 import {
@@ -25,7 +25,6 @@ import {
 } from "@/components/features/dashboard/dashboard-sections";
 
 const quickActions = [
-  { label: "Nueva Meta", icon: Plus, href: "/goals/new", color: "bg-primary" },
   {
     label: "Agregar Ahorro",
     icon: DollarSign,

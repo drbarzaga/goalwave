@@ -4,11 +4,11 @@ import SidebarNav from "./sidebar-nav";
 import Topbar from "./topbar";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 
-export default function PageContainer({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+interface PageContainerProps {
+  readonly children: React.ReactNode;
+}
+
+export default function PageContainer({ children }: PageContainerProps) {
   return (
     <SidebarProvider defaultOpen={true}>
       <SidebarNav />

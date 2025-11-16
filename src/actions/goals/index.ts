@@ -117,6 +117,39 @@ export async function deleteGoalAction() {
   // TODO: Implement the delete goal action
 }
 
+// Get goal title by ID (for breadcrumb)
+export async function getGoalTitleAction(goalId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión",
+      });
+    }
+
+    const goalData = await db
+      .select({ title: goals.title })
+      .from(goals)
+      .where(eq(goals.id, goalId))
+      .limit(1);
+
+    if (goalData.length === 0) {
+      return createErrorResult("Not Found", {
+        message: "Meta no encontrada",
+      });
+    }
+
+    return createSuccessResult("Título obtenido exitosamente", {
+      title: goalData[0].title,
+    });
+  } catch (error) {
+    return handleActionError<string>(error, "");
+  }
+}
+
 export async function getGoalsAction() {
   try {
     const session = await auth.api.getSession({

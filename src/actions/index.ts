@@ -10,6 +10,7 @@ import {
   updateGoalAction,
   deleteGoalAction,
   getGoalsAction,
+  getGoalTitleAction,
 } from "./goals";
 
 export const actions = {
@@ -24,5 +25,6 @@ export const actions = {
     update: updateGoalAction,
     delete: deleteGoalAction,
     get: getGoalsAction,
+    getTitle: getGoalTitleAction,
   },
 };

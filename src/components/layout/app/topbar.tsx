@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
@@ -10,10 +10,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { Plus, Bell } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { actions } from "@/actions";
 import {
   Sheet,
   SheetContent,
@@ -23,6 +22,8 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
+  Plus,
+  Bell,
   CheckCheck,
   Trash2,
   TrendingUp,
@@ -97,16 +98,62 @@ export default function Topbar() {
     }
   };
 
+  // Extract goal ID from pathname
+  const goalId = useMemo(() => {
+    const paths = pathname.split("/").filter(Boolean);
+    const goalIdIndex = paths.findIndex(
+      (p, i) =>
+        paths[i - 1] === "goals" &&
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          p
+        )
+    );
+    return goalIdIndex !== -1 ? paths[goalIdIndex] : null;
+  }, [pathname]);
+
+  // Get goal title from localStorage (synchronously)
+  const storedGoalTitle = useMemo(() => {
+    if (!goalId || typeof globalThis.window === "undefined") {
+      return null;
+    }
+    return globalThis.window.localStorage.getItem(`goal-title-${goalId}`);
+  }, [goalId]);
+
+  const [fetchedGoalTitle, setFetchedGoalTitle] = useState<string | null>(null);
+
+  // Fetch goal title from API if not in localStorage
+  useEffect(() => {
+    if (!goalId || storedGoalTitle) {
+      return;
+    }
+
+    actions.goals.getTitle(goalId).then((result) => {
+      if (
+        result.success &&
+        result.data &&
+        typeof result.data === "object" &&
+        "title" in result.data
+      ) {
+        const title = result.data.title as string;
+        setFetchedGoalTitle(title);
+        if (typeof globalThis.window !== "undefined") {
+          globalThis.window.localStorage.setItem(`goal-title-${goalId}`, title);
+        }
+      }
+    });
+  }, [goalId, storedGoalTitle]);
+
+  // Use stored title if available, otherwise use fetched title
+  const goalTitle = storedGoalTitle || fetchedGoalTitle;
+
   const generateBreadcrumbs = () => {
     const paths = pathname.split("/").filter(Boolean);
     const breadcrumbs: Array<{ label: string; href: string }> = [];
 
-    // Si estamos en la página principal, no mostrar breadcrumbs
     if (pathname === "/" || pathname === "/dashboard") {
       return breadcrumbs;
     }
 
-    // Solo agregar Dashboard si hay rutas adicionales
     if (paths.length > 0) {
       breadcrumbs.push({ label: "Dashboard", href: "/dashboard" });
     }
@@ -122,32 +169,41 @@ export default function Topbar() {
       settings: "Configuración",
     };
 
-    paths.forEach((path, index) => {
+    for (const [index, path] of paths.entries()) {
       const href = "/" + paths.slice(0, index + 1).join("/");
-      const label =
-        pathMap[path] || path.charAt(0).toUpperCase() + path.slice(1);
+      let label = pathMap[path] || path.charAt(0).toUpperCase() + path.slice(1);
 
-      if (!isNaN(Number(path))) {
-        breadcrumbs.push({ label: "Detalles", href });
-      } else {
-        breadcrumbs.push({ label, href });
+      const isUUID =
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          path
+        );
+      if (isUUID) {
+        // Use goal title if available, otherwise show "Detalles"
+        label = goalTitle || "Detalles";
       }
-    });
+
+      breadcrumbs.push({ label, href });
+    }
 
     return breadcrumbs;
   };
 
   const breadcrumbs = generateBreadcrumbs();
 
+  let sidebarLeft: string | number;
+  if (isMobile) {
+    sidebarLeft = 0;
+  } else if (isCollapsed) {
+    sidebarLeft = "var(--sidebar-width-icon)";
+  } else {
+    sidebarLeft = "var(--sidebar-width)";
+  }
+
   return (
     <div
       className="fixed top-0 right-0 z-40 border-b bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 transition-[left] duration-200 md:transition-[left]"
       style={{
-        left: isMobile
-          ? 0
-          : isCollapsed
-            ? "var(--sidebar-width-icon)"
-            : "var(--sidebar-width)",
+        left: sidebarLeft,
       }}
     >
       <div className="flex h-14 items-center justify-between px-6">
