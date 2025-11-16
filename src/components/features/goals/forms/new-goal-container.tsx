@@ -32,7 +32,7 @@ export default function NewGoalContainer() {
 
   return (
     <div className="grid gap-6 lg:grid-cols-[2fr_1fr] items-stretch">
-      {/* Columna principal - Formulario */}
+      {/* Main column - Form */}
       <Card className="flex flex-col h-full">
         <CardHeader>
           <CardTitle>Información de la Meta</CardTitle>
@@ -48,7 +48,7 @@ export default function NewGoalContainer() {
         </CardContent>
       </Card>
 
-      {/* Columna secundaria - Preview y Consejos */}
+      {/* Secondary column - Preview and Tips */}
       <div className="space-y-6 flex flex-col h-full">
         <NewGoalPreview formData={formData} categories={categories} />
         <NewGoalTips />
@@ -56,4 +56,3 @@ export default function NewGoalContainer() {
     </div>
   );
 }
-
