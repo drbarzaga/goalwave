@@ -16,9 +16,9 @@ import {
 } from "@/lib/validations/goals";
 import { ActionResult } from "@/types/core";
 import { GoalFormData } from "@/types/goals";
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and } from "drizzle-orm";
 import { headers } from "next/headers";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import {
   GOAL_CATEGORIES,
@@ -170,6 +170,13 @@ export async function updateGoalAction(
     if (existingGoal.userId !== session.user.id) {
       return createErrorResult("Forbidden", {
         message: "No tienes permiso para editar esta meta",
+      });
+    }
+
+    // Check if goal is completed
+    if (existingGoal.status === "completed") {
+      return createErrorResult("Goal completed", {
+        message: "No se puede editar una meta completada",
       });
     }
 
@@ -550,6 +557,13 @@ export async function createTransactionAction(
       });
     }
 
+    // Check if goal is completed
+    if (goal.status === "completed") {
+      return createErrorResult("Goal completed", {
+        message: "No se pueden agregar transacciones a una meta completada",
+      });
+    }
+
     // Check if withdrawal would result in negative balance
     const currentAmount = Number.parseFloat(goal.currentAmount || "0");
     const transactionAmount = validation.data.amount;
@@ -709,5 +723,114 @@ export async function getGoalTransactionsAction(goalId: string) {
       transactions: [],
       total: 0,
     });
+  }
+}
+
+export type Achievement = {
+  id: string;
+  title: string;
+  description: string;
+  completedAt: Date;
+  formattedDate: string;
+};
+
+export async function getRecentAchievementsAction(limit: number = 5) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<{ achievements: Achievement[] }>(
+        "Debes iniciar sesión para ver tus logros",
+        { achievements: [] }
+      );
+    }
+
+    const completedGoals = await db
+      .select()
+      .from(goals)
+      .where(and(eq(goals.userId, session.user.id), eq(goals.status, "completed")))
+      .orderBy(desc(goals.updatedAt))
+      .limit(limit);
+
+    const achievements: Achievement[] = completedGoals.map((goal) => {
+      const completedAt = goal.updatedAt || goal.createdAt;
+      const formattedDate = formatDistanceToNow(completedAt, {
+        addSuffix: true,
+        locale: es,
+      });
+
+      return {
+        id: goal.id,
+        title: goal.title,
+        description: `Completaste tu meta: ${goal.title}`,
+        completedAt,
+        formattedDate: formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1),
+      };
+    });
+
+    return createSuccessResult("Logros obtenidos exitosamente", {
+      achievements,
+    });
+  } catch (error) {
+    return handleActionError<{ achievements: Achievement[] }>(error, {
+      achievements: [],
+    });
+  }
+}
+
+export async function markGoalAsCompletedAction(goalId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión para completar una meta",
+      });
+    }
+
+    // Verify goal exists and belongs to user
+    const [existingGoal] = await db
+      .select()
+      .from(goals)
+      .where(eq(goals.id, goalId))
+      .limit(1);
+
+    if (!existingGoal) {
+      return createErrorResult("Not Found", {
+        message: "Meta no encontrada",
+      });
+    }
+
+    if (existingGoal.userId !== session.user.id) {
+      return createErrorResult("Forbidden", {
+        message: "No tienes permiso para completar esta meta",
+      });
+    }
+
+    if (existingGoal.status === "completed") {
+      return createErrorResult("Already completed", {
+        message: "Esta meta ya está completada",
+      });
+    }
+
+    // Update goal status to completed
+    const [updatedGoal] = await db
+      .update(goals)
+      .set({
+        status: "completed",
+        updatedAt: new Date(),
+      })
+      .where(eq(goals.id, goalId))
+      .returning();
+
+    return createSuccessResult("¡Meta completada! Has alcanzado tu objetivo", {
+      goal: updatedGoal,
+    });
+  } catch (error) {
+    return handleActionError(error, null);
   }
 }

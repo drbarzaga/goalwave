@@ -297,20 +297,9 @@ export async function TodayActivitiesSection() {
 
 // Recent Achievements Section
 export async function RecentAchievementsSection() {
-  const achievements = [
-    {
-      title: "Primera Meta Completada",
-      description: "Completaste tu primera meta financiera",
-      date: "Hace 2 días",
-      icon: Trophy,
-    },
-    {
-      title: "Ahorrador Consistente",
-      description: "7 días consecutivos agregando ahorros",
-      date: "Hace 5 días",
-      icon: Trophy,
-    },
-  ];
+  const result = await actions.goals.getRecentAchievements(5);
+
+  const achievements = result.success && result.data ? result.data.achievements : [];
 
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
@@ -321,15 +310,31 @@ export async function RecentAchievementsSection() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        {achievements.map((achievement, index) => {
-          const Icon = achievement.icon;
-          return (
+        {achievements.length === 0 ? (
+          <div className="text-center py-8">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
+                <Trophy className="h-6 w-6 text-amber-600 dark:text-amber-500" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  Aún no has conseguido tu primer logro
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  No dejes de esforzarte, cada meta completada es un paso más
+                  hacia tus objetivos financieros
+                </p>
+              </div>
+            </div>
+          </div>
+        ) : (
+          achievements.map((achievement) => (
             <div
-              key={index}
+              key={achievement.id}
               className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-accent/50 transition-colors"
             >
               <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-amber-500/10">
-                <Icon className="h-4 w-4 text-amber-600 dark:text-amber-500" />
+                <Trophy className="h-4 w-4 text-amber-600 dark:text-amber-500" />
               </div>
               <div className="flex-1">
                 <p className="text-sm font-medium">{achievement.title}</p>
@@ -337,12 +342,12 @@ export async function RecentAchievementsSection() {
                   {achievement.description}
                 </p>
                 <p className="text-xs text-muted-foreground mt-1">
-                  {achievement.date}
+                  {achievement.formattedDate}
                 </p>
               </div>
             </div>
-          );
-        })}
+          ))
+        )}
       </CardContent>
     </Card>
   );

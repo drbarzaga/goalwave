@@ -28,9 +28,7 @@ class EmailService {
   private constructor() {}
 
   public static getInstance(): EmailService {
-    if (!EmailService.instance) {
-      EmailService.instance = new EmailService();
-    }
+    EmailService.instance ??= new EmailService();
     return EmailService.instance;
   }
 

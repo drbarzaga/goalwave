@@ -75,6 +75,7 @@ export default async function GoalDetailsPage({
           priority={goalData.priority}
           savingFrequency={goalData.savingFrequency}
           reminderEnabled={goalData.reminderEnabled}
+          status={goalData.status}
         />
       </div>
     </GoalTitleProvider>

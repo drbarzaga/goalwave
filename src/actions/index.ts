@@ -15,6 +15,8 @@ import {
   createTransactionFormAction,
   getGoalByIdAction,
   getGoalTransactionsAction,
+  getRecentAchievementsAction,
+  markGoalAsCompletedAction,
 } from "./goals";
 
 export const actions = {
@@ -34,5 +36,7 @@ export const actions = {
     getTransactions: getGoalTransactionsAction,
     createTransaction: createTransactionAction,
     createTransactionForm: createTransactionFormAction,
+    getRecentAchievements: getRecentAchievementsAction,
+    markAsCompleted: markGoalAsCompletedAction,
   },
 };

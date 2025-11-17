@@ -32,6 +32,7 @@ interface GoalDetailsContentProps {
   readonly priority?: string;
   readonly savingFrequency: string;
   readonly reminderEnabled: boolean;
+  readonly status: string;
 }
 
 export function GoalDetailsContent({
@@ -48,6 +49,7 @@ export function GoalDetailsContent({
   priority,
   savingFrequency,
   reminderEnabled,
+  status,
 }: GoalDetailsContentProps) {
   const router = useRouter();
   const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
@@ -61,6 +63,9 @@ export function GoalDetailsContent({
   }, [initialCurrentAmount]);
 
   const handleAddFunds = () => {
+    if (status === "completed") {
+      return;
+    }
     setIsTransactionModalOpen(true);
   };
 
@@ -72,6 +77,9 @@ export function GoalDetailsContent({
   };
 
   const handleEdit = () => {
+    if (status === "completed") {
+      return;
+    }
     setIsEditModalOpen(true);
   };
 
@@ -97,6 +105,7 @@ export function GoalDetailsContent({
           category={category}
           currentAmount={currentAmount}
           targetAmount={targetAmount}
+          status={status}
           onAddFunds={handleAddFunds}
         />
 
@@ -112,7 +121,14 @@ export function GoalDetailsContent({
           reminderEnabled={reminderEnabled}
         />
 
-        <GoalActionsCard onEdit={handleEdit} onDelete={handleDelete} />
+        <GoalActionsCard
+          goalId={goalId}
+          status={status}
+          currentAmount={currentAmount}
+          targetAmount={targetAmount}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
+        />
       </div>
 
       <TransactionModal

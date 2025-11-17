@@ -18,6 +18,7 @@ interface GoalProgressCardProps {
   readonly category: string; // category value (e.g., "emergency", "travel")
   readonly currentAmount: number;
   readonly targetAmount: number;
+  readonly status: string;
   readonly onAddFunds: () => void;
 }
 
@@ -49,11 +50,13 @@ export function GoalProgressCard({
   category,
   currentAmount,
   targetAmount,
+  status,
   onAddFunds,
 }: GoalProgressCardProps) {
   const progress = calculateProgress(currentAmount, targetAmount);
   const remaining = Math.max(0, targetAmount - currentAmount);
   const categoryConfig = getCategoryConfig(category);
+  const isCompleted = status === "completed";
 
   return (
     <Card>
@@ -120,9 +123,19 @@ export function GoalProgressCard({
           </div>
         </div>
 
-        <Button onClick={onAddFunds} className="w-full" size="lg">
+        <Button
+          onClick={onAddFunds}
+          className="w-full"
+          size="lg"
+          disabled={isCompleted}
+          title={
+            isCompleted
+              ? "Esta meta está completada y no se pueden agregar más transacciones"
+              : undefined
+          }
+        >
           <ArrowUpDown className="w-4 h-4" />
-          Nueva Transacción
+          {isCompleted ? "Meta Completada" : "Nueva Transacción"}
         </Button>
       </CardContent>
     </Card>
