@@ -122,3 +122,34 @@ export const createTransactionSchema = z.object({
     .optional()
     .or(z.literal("")),
 });
+
+// Update goal form schema (with cross-field validation for amounts)
+export const updateGoalFormSchema = createGoalFormSchema.superRefine(
+  (data, ctx) => {
+    const targetAmount = Number.parseFloat(data.targetAmount || "0");
+    const currentAmount = Number.parseFloat(data.currentAmount || "0");
+
+    // Validate that currentAmount doesn't exceed targetAmount
+    if (!Number.isNaN(currentAmount) && !Number.isNaN(targetAmount)) {
+      if (currentAmount > targetAmount) {
+        ctx.addIssue({
+          code: "custom",
+          message: "El monto actual no puede ser mayor que el monto objetivo",
+          path: ["currentAmount"],
+        });
+      }
+    }
+  }
+);
+
+// Update goal schema (with cross-field validation for server-side)
+export const updateGoalSchema = createGoalSchema.superRefine((data, ctx) => {
+  // Validate that currentAmount doesn't exceed targetAmount
+  if (data.currentAmount > data.targetAmount) {
+    ctx.addIssue({
+      code: "custom",
+      message: "El monto actual no puede ser mayor que el monto objetivo",
+      path: ["currentAmount"],
+    });
+  }
+});

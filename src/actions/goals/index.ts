@@ -12,6 +12,7 @@ import { auth } from "@/lib/auth";
 import {
   createGoalSchema,
   createTransactionSchema,
+  updateGoalSchema,
 } from "@/lib/validations/goals";
 import { ActionResult } from "@/types/core";
 import { GoalFormData } from "@/types/goals";
@@ -112,12 +113,187 @@ export async function createGoalAction(
   }
 }
 
-export async function updateGoalAction() {
-  // TODO: Implement the update goal action
+export async function updateGoalAction(
+  prevState: ActionResult<GoalFormData> | null,
+  formData: FormData
+) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+
+  if (!session) {
+    return createErrorResult("Unauthorized", {
+      message: "Debes iniciar sesión para editar una meta",
+    });
+  }
+
+  const goalId = formData.get("goalId") as string;
+  if (!goalId) {
+    return createErrorResult("Validation error", {
+      message: "ID de meta requerido",
+    });
+  }
+
+  const dateValue = formData.get("date");
+  let date: Date | undefined = undefined;
+
+  if (dateValue && !Number.isNaN(Date.parse(dateValue as string))) {
+    date = new Date(dateValue as string);
+  }
+
+  const rawData = {
+    title: formData.get("title") as string,
+    description: formData.get("description") as string,
+    category: formData.get("category") as string,
+    targetAmount: formData.get("targetAmount") as string,
+    currentAmount: formData.get("currentAmount") as string,
+    date,
+    priority: formData.get("priority") as string,
+    savingFrequency: formData.get("savingFrequency") as string,
+    reminderEnabled: formData.get("reminderEnabled") === "on",
+  };
+
+  try {
+    // Verify goal exists and belongs to user
+    const [existingGoal] = await db
+      .select()
+      .from(goals)
+      .where(eq(goals.id, goalId))
+      .limit(1);
+
+    if (!existingGoal) {
+      return createErrorResult("Not Found", {
+        message: "Meta no encontrada",
+      });
+    }
+
+    if (existingGoal.userId !== session.user.id) {
+      return createErrorResult("Forbidden", {
+        message: "No tienes permiso para editar esta meta",
+      });
+    }
+
+    const validation = validateWithSchema(updateGoalSchema, {
+      ...rawData,
+      targetDate: date,
+    });
+
+    if (!validation.success) {
+      return createErrorResult("Invalid form data", {
+        message: "Por favor verifica los datos del formulario e intenta de nuevo",
+        data: rawData,
+      });
+    }
+
+    const {
+      title,
+      description,
+      category,
+      targetAmount,
+      currentAmount,
+      targetDate,
+      priority,
+      savingFrequency,
+      reminderEnabled,
+    } = validation.data;
+
+    // Business rules for amounts:
+    // 1. If targetAmount is reduced below currentAmount, adjust currentAmount
+    // 2. Ensure currentAmount doesn't exceed targetAmount
+    const existingCurrentAmount = Number.parseFloat(
+      existingGoal.currentAmount || "0"
+    );
+    let finalCurrentAmount = currentAmount;
+
+    // If targetAmount is reduced below existing currentAmount, cap currentAmount to targetAmount
+    if (targetAmount < existingCurrentAmount) {
+      finalCurrentAmount = targetAmount;
+    }
+
+    // Ensure currentAmount doesn't exceed targetAmount (safety check)
+    if (finalCurrentAmount > targetAmount) {
+      finalCurrentAmount = targetAmount;
+    }
+
+    // Ensure currentAmount is not negative
+    if (finalCurrentAmount < 0) {
+      finalCurrentAmount = 0;
+    }
+
+    const [updatedGoal] = await db
+      .update(goals)
+      .set({
+        title,
+        description: description || null,
+        category,
+        targetAmount: targetAmount.toString(),
+        currentAmount: finalCurrentAmount.toString(),
+        targetDate: targetDate || null,
+        priority: priority || null,
+        savingFrequency,
+        reminderEnabled,
+        updatedAt: new Date(),
+      })
+      .where(eq(goals.id, goalId))
+      .returning();
+
+    return createSuccessResult("Meta actualizada exitosamente", {
+      goal: updatedGoal,
+    });
+  } catch (error) {
+    return handleActionError<GoalFormData>(error, rawData);
+  }
 }
 
-export async function deleteGoalAction() {
-  // TODO: Implement the delete goal action
+export async function deleteGoalAction(goalId: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión para eliminar una meta",
+      });
+    }
+
+    if (!goalId) {
+      return createErrorResult("Validation error", {
+        message: "ID de meta requerido",
+      });
+    }
+
+    // Verify goal exists and belongs to user
+    const [existingGoal] = await db
+      .select()
+      .from(goals)
+      .where(eq(goals.id, goalId))
+      .limit(1);
+
+    if (!existingGoal) {
+      return createErrorResult("Not Found", {
+        message: "Meta no encontrada",
+      });
+    }
+
+    if (existingGoal.userId !== session.user.id) {
+      return createErrorResult("Forbidden", {
+        message: "No tienes permiso para eliminar esta meta",
+      });
+    }
+
+    // Delete goal transactions first (cascade should handle this, but being explicit)
+    await db.delete(goalTransactions).where(eq(goalTransactions.goalId, goalId));
+
+    // Delete the goal
+    await db.delete(goals).where(eq(goals.id, goalId));
+
+    return createSuccessResult("Meta eliminada exitosamente", {
+      goalId,
+    });
+  } catch (error) {
+    return handleActionError<string>(error, goalId);
+  }
 }
 
 // Get goal title by ID (for breadcrumb)
@@ -469,6 +645,9 @@ export async function getGoalByIdAction(goalId: string) {
       deadline,
       createdAt: goalData.createdAt.toISOString(),
       status: goalData.status,
+      priority: goalData.priority || undefined,
+      savingFrequency: goalData.savingFrequency,
+      reminderEnabled: goalData.reminderEnabled,
     });
   } catch (error) {
     return handleActionError<null>(error, null);

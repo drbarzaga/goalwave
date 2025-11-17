@@ -35,6 +35,9 @@ export default async function GoalDetailsPage({
     deadline?: string;
     createdAt: string;
     status: string;
+    priority?: string;
+    savingFrequency: string;
+    reminderEnabled: boolean;
   };
   const goalTitle = goalData.title;
 
@@ -69,6 +72,9 @@ export default async function GoalDetailsPage({
           createdAt={goalData.createdAt}
           totalTransactions={transactions.length}
           transactions={transactions}
+          priority={goalData.priority}
+          savingFrequency={goalData.savingFrequency}
+          reminderEnabled={goalData.reminderEnabled}
         />
       </div>
     </GoalTitleProvider>

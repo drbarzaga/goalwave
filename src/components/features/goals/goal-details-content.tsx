@@ -7,6 +7,8 @@ import { TransactionsHistoryCard } from "./transactions-history-card";
 import { GoalInfoCard } from "./goal-info-card";
 import { GoalActionsCard } from "./goal-actions-card";
 import { TransactionModal } from "./transaction-modal";
+import { EditGoalModal } from "./edit-goal-modal";
+import { DeleteGoalDialog } from "./delete-goal-dialog";
 
 interface Transaction {
   readonly id: string;
@@ -27,6 +29,9 @@ interface GoalDetailsContentProps {
   readonly createdAt: string;
   readonly totalTransactions: number;
   readonly transactions: Transaction[];
+  readonly priority?: string;
+  readonly savingFrequency: string;
+  readonly reminderEnabled: boolean;
 }
 
 export function GoalDetailsContent({
@@ -40,9 +45,14 @@ export function GoalDetailsContent({
   createdAt,
   totalTransactions,
   transactions,
+  priority,
+  savingFrequency,
+  reminderEnabled,
 }: GoalDetailsContentProps) {
   const router = useRouter();
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isTransactionModalOpen, setIsTransactionModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentAmount, setCurrentAmount] = useState(initialCurrentAmount);
 
   // Update currentAmount when prop changes (after refresh)
@@ -51,7 +61,7 @@ export function GoalDetailsContent({
   }, [initialCurrentAmount]);
 
   const handleAddFunds = () => {
-    setIsModalOpen(true);
+    setIsTransactionModalOpen(true);
   };
 
   const handleTransactionSuccess = () => {
@@ -62,13 +72,19 @@ export function GoalDetailsContent({
   };
 
   const handleEdit = () => {
-    console.log("Edit clicked");
-    // TODO: Implement edit logic
+    setIsEditModalOpen(true);
   };
 
   const handleDelete = () => {
-    console.log("Delete clicked");
-    // TODO: Implement delete logic
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleEditSuccess = () => {
+    router.refresh();
+  };
+
+  const handleDeleteSuccess = () => {
+    // Navigation is handled in DeleteGoalDialog
   };
 
   return (
@@ -93,17 +109,44 @@ export function GoalDetailsContent({
           deadline={deadline}
           createdAt={createdAt}
           totalTransactions={totalTransactions}
+          reminderEnabled={reminderEnabled}
         />
 
         <GoalActionsCard onEdit={handleEdit} onDelete={handleDelete} />
       </div>
 
       <TransactionModal
-        open={isModalOpen}
-        onOpenChange={setIsModalOpen}
+        open={isTransactionModalOpen}
+        onOpenChange={setIsTransactionModalOpen}
         goalId={goalId}
         currentAmount={currentAmount}
         onSuccess={handleTransactionSuccess}
+      />
+
+      <EditGoalModal
+        open={isEditModalOpen}
+        onOpenChange={setIsEditModalOpen}
+        goalId={goalId}
+        initialData={{
+          title,
+          description,
+          category,
+          targetAmount,
+          currentAmount,
+          deadline,
+          priority,
+          savingFrequency,
+          reminderEnabled,
+        }}
+        onSuccess={handleEditSuccess}
+      />
+
+      <DeleteGoalDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+        goalId={goalId}
+        goalTitle={title}
+        onSuccess={handleDeleteSuccess}
       />
     </div>
   );

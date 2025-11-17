@@ -33,6 +33,7 @@ import {
   Target,
   Bell,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
@@ -41,7 +42,7 @@ import { useNewGoalForm } from "@/components/providers/new-goal-form-provider";
 import { ActionResult } from "@/types/core";
 import { CreateGoalFormData, GoalFormData } from "@/types/goals";
 import { actions } from "@/actions";
-import { useForm, useWatch } from "react-hook-form";
+import { useForm, useWatch, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createGoalFormSchema } from "@/lib/validations/goals";
 import { toast } from "sonner";
@@ -438,13 +439,6 @@ export default function NewGoalForm() {
           orientation="horizontal"
           className="rounded-md border p-4 bg-muted/30"
         >
-          <input
-            type="checkbox"
-            id="reminder"
-            disabled={isPending}
-            {...register("reminderEnabled")}
-            className="mt-1 h-4 w-4 rounded border-input accent-primary cursor-pointer"
-          />
           <div className="flex-1">
             <FieldLabel
               htmlFor="reminder"
@@ -457,6 +451,18 @@ export default function NewGoalForm() {
               Recibe notificaciones para mantenerte al día con tus ahorros
             </FieldDescription>
           </div>
+          <Controller
+            name="reminderEnabled"
+            control={control}
+            render={({ field }) => (
+              <Switch
+                id="reminder"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+                disabled={isPending}
+              />
+            )}
+          />
         </Field>
 
         <Field orientation="horizontal">
