@@ -14,7 +14,7 @@ export const auth = betterAuth({
     schema,
   }),
   session: {
-    expiresIn: 60 * 60 * 24 * 7, // 7 days
+    expiresIn: 60 * 60 * 24, // 1 day
     updateAge: 60 * 60 * 24, // 1 day
     cookieSecure: process.env.NODE_ENV === "production",
     cookieCache: {
