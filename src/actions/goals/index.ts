@@ -16,7 +16,7 @@ import {
 } from "@/lib/validations/goals";
 import { ActionResult } from "@/types/core";
 import { GoalFormData } from "@/types/goals";
-import { desc, eq, and } from "drizzle-orm";
+import { desc, eq, and, gte, lt, inArray } from "drizzle-orm";
 import { headers } from "next/headers";
 import { format, formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
@@ -187,7 +187,8 @@ export async function updateGoalAction(
 
     if (!validation.success) {
       return createErrorResult("Invalid form data", {
-        message: "Por favor verifica los datos del formulario e intenta de nuevo",
+        message:
+          "Por favor verifica los datos del formulario e intenta de nuevo",
         data: rawData,
       });
     }
@@ -290,7 +291,9 @@ export async function deleteGoalAction(goalId: string) {
     }
 
     // Delete goal transactions first (cascade should handle this, but being explicit)
-    await db.delete(goalTransactions).where(eq(goalTransactions.goalId, goalId));
+    await db
+      .delete(goalTransactions)
+      .where(eq(goalTransactions.goalId, goalId));
 
     // Delete the goal
     await db.delete(goals).where(eq(goals.id, goalId));
@@ -750,7 +753,9 @@ export async function getRecentAchievementsAction(limit: number = 5) {
     const completedGoals = await db
       .select()
       .from(goals)
-      .where(and(eq(goals.userId, session.user.id), eq(goals.status, "completed")))
+      .where(
+        and(eq(goals.userId, session.user.id), eq(goals.status, "completed"))
+      )
       .orderBy(desc(goals.updatedAt))
       .limit(limit);
 
@@ -766,7 +771,8 @@ export async function getRecentAchievementsAction(limit: number = 5) {
         title: goal.title,
         description: `Completaste tu meta: ${goal.title}`,
         completedAt,
-        formattedDate: formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1),
+        formattedDate:
+          formattedDate.charAt(0).toUpperCase() + formattedDate.slice(1),
       };
     });
 
@@ -832,5 +838,116 @@ export async function markGoalAsCompletedAction(goalId: string) {
     });
   } catch (error) {
     return handleActionError(error, null);
+  }
+}
+
+export type MonthlySummary = {
+  totalIncome: number;
+  totalExpenses: number;
+  totalSavings: number;
+  incomePercentage: number;
+  expensesPercentage: number;
+  savingsPercentage: number;
+};
+
+export async function getMonthlySummaryAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<MonthlySummary>("Unauthorized", {
+        message: "Debes iniciar sesión para ver el resumen mensual",
+        totalIncome: 0,
+        totalExpenses: 0,
+        totalSavings: 0,
+        incomePercentage: 0,
+        expensesPercentage: 0,
+        savingsPercentage: 0,
+      });
+    }
+
+    // Get current month start and end dates
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    // Get all user's goals
+    const userGoals = await db
+      .select({ id: goals.id })
+      .from(goals)
+      .where(eq(goals.userId, session.user.id));
+
+    const goalIds = userGoals.map((g) => g.id);
+
+    if (goalIds.length === 0) {
+      return createSuccessResult("Resumen mensual obtenido exitosamente", {
+        totalIncome: 0,
+        totalExpenses: 0,
+        totalSavings: 0,
+        incomePercentage: 0,
+        expensesPercentage: 0,
+        savingsPercentage: 0,
+      });
+    }
+
+    // Get all transactions for this month
+    const monthlyTransactions = await db
+      .select({
+        type: goalTransactions.type,
+        amount: goalTransactions.amount,
+      })
+      .from(goalTransactions)
+      .where(
+        and(
+          inArray(goalTransactions.goalId, goalIds),
+          gte(goalTransactions.createdAt, startOfMonth),
+          lt(goalTransactions.createdAt, startOfNextMonth)
+        )
+      );
+
+    // Calculate totals
+    let totalIncome = 0;
+    let totalExpenses = 0;
+
+    for (const transaction of monthlyTransactions) {
+      const amount = Number.parseFloat(transaction.amount || "0");
+      if (transaction.type === "deposit") {
+        totalIncome += amount;
+      } else if (transaction.type === "withdrawal") {
+        totalExpenses += amount;
+      }
+    }
+
+    const totalSavings = totalIncome - totalExpenses;
+
+    const incomePercentage = totalIncome > 0 ? PERCENTAGE_MAX : 0;
+    const expensesPercentage =
+      totalIncome > 0
+        ? Math.round((totalExpenses / totalIncome) * PERCENTAGE_MAX)
+        : 0;
+    const savingsPercentage =
+      totalIncome > 0
+        ? Math.round((totalSavings / totalIncome) * PERCENTAGE_MAX)
+        : 0;
+
+    return createSuccessResult("Resumen mensual obtenido exitosamente", {
+      totalIncome,
+      totalExpenses,
+      totalSavings,
+      incomePercentage,
+      expensesPercentage,
+      savingsPercentage,
+    });
+  } catch (error) {
+    return handleActionError<MonthlySummary>(error, {
+      totalIncome: 0,
+      totalExpenses: 0,
+      totalSavings: 0,
+      incomePercentage: 0,
+      expensesPercentage: 0,
+      savingsPercentage: 0,
+    });
   }
 }

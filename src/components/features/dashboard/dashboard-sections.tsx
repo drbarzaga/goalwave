@@ -113,12 +113,25 @@ export async function RecentGoalsSection() {
       <CardContent>
         {recentGoals.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground text-sm">
-              No tienes metas aún.{" "}
-              <Link href="/goals/new" className="text-primary hover:underline">
-                Crea tu primera meta
-              </Link>
-            </p>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-primary/10">
+                <Target className="h-6 w-6 text-primary" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  No tienes metas aún
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Comienza tu viaje hacia tus objetivos financieros{" "}
+                  <Link
+                    href="/goals/new"
+                    className="text-primary hover:underline font-medium"
+                  >
+                    creando tu primera meta
+                  </Link>
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 auto-rows-fr">
@@ -159,9 +172,19 @@ export async function UpcomingDeadlinesSection() {
       <CardContent className="space-y-4">
         {goalsWithDeadlines.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-muted-foreground text-sm">
-              No hay vencimientos próximos
-            </p>
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-orange-500/10">
+                <Clock className="h-6 w-6 text-orange-600 dark:text-orange-400" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  No hay vencimientos próximos
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Tus metas no tienen fechas límite cercanas o ya están completadas
+                </p>
+              </div>
+            </div>
           </div>
         ) : (
           <>
@@ -209,6 +232,26 @@ export async function UpcomingDeadlinesSection() {
 
 // Monthly Summary Section
 export async function MonthlySummarySection() {
+  const result = await actions.goals.getMonthlySummary();
+
+  const summary = result.success && result.data
+    ? result.data
+    : {
+        totalIncome: 0,
+        totalExpenses: 0,
+        totalSavings: 0,
+        incomePercentage: 0,
+        expensesPercentage: 0,
+        savingsPercentage: 0,
+      };
+
+  const formatCurrency = (amount: number) => {
+    return `$${amount.toLocaleString("es-MX", {
+      minimumFractionDigits: PERCENTAGE_DEFAULT,
+      maximumFractionDigits: PERCENTAGE_DEFAULT,
+    })}`;
+  };
+
   return (
     <Card className="transition-all duration-300 hover:shadow-md">
       <CardHeader>
@@ -218,27 +261,72 @@ export async function MonthlySummarySection() {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Ingreso Total</span>
-            <span className="font-semibold">$5,200</span>
+        {summary.totalIncome === 0 && summary.totalExpenses === 0 ? (
+          <div className="text-center py-8">
+            <div className="flex flex-col items-center gap-3">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-blue-500/10">
+                <TrendingUp className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <div className="space-y-1">
+                <p className="text-sm font-medium text-foreground">
+                  No hay transacciones este mes
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Agrega transacciones a tus metas para ver el resumen
+                </p>
+              </div>
+            </div>
           </div>
-          <Progress value={100} className="h-2 w-full" />
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Gastos</span>
-            <span className="font-semibold">$3,800</span>
-          </div>
-          <Progress value={73} className="h-2 w-full" />
-        </div>
-        <div className="space-y-2">
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Ahorros</span>
-            <span className="font-semibold text-green-500">$1,400</span>
-          </div>
-          <Progress value={27} className="h-2 w-full [&>div]:bg-green-500" />
-        </div>
+        ) : (
+          <>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Ingreso Total</span>
+                <span className="font-semibold">
+                  {formatCurrency(summary.totalIncome)}
+                </span>
+              </div>
+              <Progress
+                value={summary.incomePercentage}
+                className="h-2 w-full"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Gastos</span>
+                <span className="font-semibold">
+                  {formatCurrency(summary.totalExpenses)}
+                </span>
+              </div>
+              <Progress
+                value={summary.expensesPercentage}
+                className="h-2 w-full [&>div]:bg-red-500"
+              />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-sm">
+                <span className="text-muted-foreground">Ahorros</span>
+                <span
+                  className={`font-semibold ${
+                    summary.totalSavings >= 0
+                      ? "text-green-500"
+                      : "text-red-500"
+                  }`}
+                >
+                  {formatCurrency(summary.totalSavings)}
+                </span>
+              </div>
+              <Progress
+                value={Math.max(0, summary.savingsPercentage)}
+                className={`h-2 w-full ${
+                  summary.totalSavings >= 0
+                    ? "[&>div]:bg-green-500"
+                    : "[&>div]:bg-red-500"
+                }`}
+              />
+            </div>
+          </>
+        )}
         <div className="pt-4 border-t">
           <Link href="/reports">
             <Button variant="outline" size="sm" className="w-full gap-2">
