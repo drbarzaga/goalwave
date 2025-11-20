@@ -118,4 +118,12 @@ export const pageMetadata = {
       keywords: ["dashboard", "account"],
       noindex: true,
     }),
+
+  reports: (): Metadata =>
+    createPageMetadata({
+      title: "Reportes",
+      description: `Analiza tu progreso financiero y toma decisiones informadas con los reportes de ${appName}.`,
+      keywords: ["reportes", "análisis financiero", "estadísticas", "progreso"],
+      noindex: true,
+    }),
 };

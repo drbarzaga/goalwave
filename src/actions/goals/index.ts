@@ -951,3 +951,507 @@ export async function getMonthlySummaryAction() {
     });
   }
 }
+
+// Reports Actions
+export type MonthlyComparison = {
+  currentMonth: {
+    totalIncome: number;
+    totalExpenses: number;
+    totalSavings: number;
+    savingsRate: number;
+  };
+  previousMonth: {
+    totalIncome: number;
+    totalExpenses: number;
+    totalSavings: number;
+    savingsRate: number;
+  };
+  incomeChange: number;
+  expensesChange: number;
+  savingsChange: number;
+  savingsRateChange: number;
+};
+
+export async function getReportsSummaryAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<MonthlyComparison>("Unauthorized", {
+        message: "Debes iniciar sesión para ver los reportes",
+        currentMonth: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          totalSavings: 0,
+          savingsRate: 0,
+        },
+        previousMonth: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          totalSavings: 0,
+          savingsRate: 0,
+        },
+        incomeChange: 0,
+        expensesChange: 0,
+        savingsChange: 0,
+        savingsRateChange: 0,
+      });
+    }
+
+    // Get all user's goals
+    const userGoals = await db
+      .select({ id: goals.id })
+      .from(goals)
+      .where(eq(goals.userId, session.user.id));
+
+    const goalIds = userGoals.map((g) => g.id);
+
+    if (goalIds.length === 0) {
+      return createSuccessResult("Resumen obtenido exitosamente", {
+        currentMonth: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          totalSavings: 0,
+          savingsRate: 0,
+        },
+        previousMonth: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          totalSavings: 0,
+          savingsRate: 0,
+        },
+        incomeChange: 0,
+        expensesChange: 0,
+        savingsChange: 0,
+        savingsRateChange: 0,
+      });
+    }
+
+    const now = new Date();
+
+    // Current month
+    const startOfCurrentMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    // Previous month
+    const startOfPreviousMonth = new Date(
+      now.getFullYear(),
+      now.getMonth() - 1,
+      1
+    );
+    const endOfPreviousMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+    // Get current month transactions
+    const currentMonthTransactions = await db
+      .select({
+        type: goalTransactions.type,
+        amount: goalTransactions.amount,
+      })
+      .from(goalTransactions)
+      .where(
+        and(
+          inArray(goalTransactions.goalId, goalIds),
+          gte(goalTransactions.createdAt, startOfCurrentMonth),
+          lt(goalTransactions.createdAt, startOfNextMonth)
+        )
+      );
+
+    // Get previous month transactions
+    const previousMonthTransactions = await db
+      .select({
+        type: goalTransactions.type,
+        amount: goalTransactions.amount,
+      })
+      .from(goalTransactions)
+      .where(
+        and(
+          inArray(goalTransactions.goalId, goalIds),
+          gte(goalTransactions.createdAt, startOfPreviousMonth),
+          lt(goalTransactions.createdAt, endOfPreviousMonth)
+        )
+      );
+
+    // Calculate current month totals
+    let currentIncome = 0;
+    let currentExpenses = 0;
+    for (const transaction of currentMonthTransactions) {
+      const amount = Number.parseFloat(transaction.amount || "0");
+      if (transaction.type === "deposit") {
+        currentIncome += amount;
+      } else if (transaction.type === "withdrawal") {
+        currentExpenses += amount;
+      }
+    }
+    const currentSavings = currentIncome - currentExpenses;
+    const currentSavingsRate =
+      currentIncome > 0
+        ? Math.round((currentSavings / currentIncome) * PERCENTAGE_MAX * 10) /
+          10
+        : 0;
+
+    // Calculate previous month totals
+    let previousIncome = 0;
+    let previousExpenses = 0;
+    for (const transaction of previousMonthTransactions) {
+      const amount = Number.parseFloat(transaction.amount || "0");
+      if (transaction.type === "deposit") {
+        previousIncome += amount;
+      } else if (transaction.type === "withdrawal") {
+        previousExpenses += amount;
+      }
+    }
+    const previousSavings = previousIncome - previousExpenses;
+    const previousSavingsRate =
+      previousIncome > 0
+        ? Math.round((previousSavings / previousIncome) * PERCENTAGE_MAX * 10) /
+          10
+        : 0;
+
+    // Calculate changes
+    const incomeChange =
+      previousIncome > 0
+        ? Math.round(
+            ((currentIncome - previousIncome) / previousIncome) *
+              PERCENTAGE_MAX *
+              10
+          ) / 10
+        : currentIncome > 0
+          ? 100
+          : 0;
+    const expensesChange =
+      previousExpenses > 0
+        ? Math.round(
+            ((currentExpenses - previousExpenses) / previousExpenses) *
+              PERCENTAGE_MAX *
+              10
+          ) / 10
+        : currentExpenses > 0
+          ? 100
+          : 0;
+    const savingsChange =
+      previousSavings !== 0
+        ? Math.round(
+            ((currentSavings - previousSavings) / Math.abs(previousSavings)) *
+              PERCENTAGE_MAX *
+              10
+          ) / 10
+        : currentSavings > 0
+          ? 100
+          : 0;
+    const savingsRateChange = currentSavingsRate - previousSavingsRate;
+
+    return createSuccessResult("Resumen obtenido exitosamente", {
+      currentMonth: {
+        totalIncome: currentIncome,
+        totalExpenses: currentExpenses,
+        totalSavings: currentSavings,
+        savingsRate: currentSavingsRate,
+      },
+      previousMonth: {
+        totalIncome: previousIncome,
+        totalExpenses: previousExpenses,
+        totalSavings: previousSavings,
+        savingsRate: previousSavingsRate,
+      },
+      incomeChange,
+      expensesChange,
+      savingsChange,
+      savingsRateChange,
+    });
+  } catch (error) {
+    return handleActionError<MonthlyComparison>(error, {
+      currentMonth: {
+        totalIncome: 0,
+        totalExpenses: 0,
+        totalSavings: 0,
+        savingsRate: 0,
+      },
+      previousMonth: {
+        totalIncome: 0,
+        totalExpenses: 0,
+        totalSavings: 0,
+        savingsRate: 0,
+      },
+      incomeChange: 0,
+      expensesChange: 0,
+      savingsChange: 0,
+      savingsRateChange: 0,
+    });
+  }
+}
+
+export type MonthlyDataPoint = {
+  month: string;
+  monthShort: string;
+  income: number;
+  expenses: number;
+  savings: number;
+};
+
+export async function getMonthlyAnalysisAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<MonthlyDataPoint[]>("Unauthorized", {
+        message: "Debes iniciar sesión para ver el análisis mensual",
+        data: [],
+      });
+    }
+
+    // Get all user's goals
+    const userGoals = await db
+      .select({ id: goals.id })
+      .from(goals)
+      .where(eq(goals.userId, session.user.id));
+
+    const goalIds = userGoals.map((g) => g.id);
+
+    if (goalIds.length === 0) {
+      return createSuccessResult("Análisis mensual obtenido exitosamente", {
+        data: [],
+      });
+    }
+
+    const now = new Date();
+    const monthlyData: MonthlyDataPoint[] = [];
+
+    // Get data for last 6 months
+    for (let i = 5; i >= 0; i--) {
+      const monthDate = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const nextMonthDate = new Date(
+        now.getFullYear(),
+        now.getMonth() - i + 1,
+        1
+      );
+
+      const monthTransactions = await db
+        .select({
+          type: goalTransactions.type,
+          amount: goalTransactions.amount,
+        })
+        .from(goalTransactions)
+        .where(
+          and(
+            inArray(goalTransactions.goalId, goalIds),
+            gte(goalTransactions.createdAt, monthDate),
+            lt(goalTransactions.createdAt, nextMonthDate)
+          )
+        );
+
+      let income = 0;
+      let expenses = 0;
+      for (const transaction of monthTransactions) {
+        const amount = Number.parseFloat(transaction.amount || "0");
+        if (transaction.type === "deposit") {
+          income += amount;
+        } else if (transaction.type === "withdrawal") {
+          expenses += amount;
+        }
+      }
+
+      const savings = income - expenses;
+      const monthName = format(monthDate, "MMMM", { locale: es });
+      const monthShort = format(monthDate, "MMM", { locale: es });
+
+      monthlyData.push({
+        month: monthName,
+        monthShort: monthShort.charAt(0).toUpperCase() + monthShort.slice(1),
+        income,
+        expenses,
+        savings,
+      });
+    }
+
+    return createSuccessResult("Análisis mensual obtenido exitosamente", {
+      data: monthlyData,
+    });
+  } catch (error) {
+    return handleActionError<{ data: MonthlyDataPoint[] }>(error, {
+      data: [],
+    });
+  }
+}
+
+export type CategoryReport = {
+  category: string;
+  totalIncome: number;
+  totalExpenses: number;
+  totalSavings: number;
+  goalCount: number;
+};
+
+export async function getCategoryReportsAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<CategoryReport[]>("Unauthorized", {
+        message: "Debes iniciar sesión para ver los reportes por categoría",
+        data: [],
+      });
+    }
+
+    // Get all user's goals with their categories
+    const userGoals = await db
+      .select({
+        id: goals.id,
+        category: goals.category,
+      })
+      .from(goals)
+      .where(eq(goals.userId, session.user.id));
+
+    if (userGoals.length === 0) {
+      return createSuccessResult(
+        "Reportes por categoría obtenidos exitosamente",
+        {
+          data: [],
+        }
+      );
+    }
+
+    const categoryMap = new Map<string, string[]>();
+
+    for (const goal of userGoals) {
+      const category = goal.category || "other";
+      if (!categoryMap.has(category)) {
+        categoryMap.set(category, []);
+      }
+      categoryMap.get(category)!.push(goal.id);
+    }
+
+    const categoryReports: CategoryReport[] = [];
+    const now = new Date();
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+    for (const [category, catGoalIds] of categoryMap.entries()) {
+      const categoryTransactions = await db
+        .select({
+          type: goalTransactions.type,
+          amount: goalTransactions.amount,
+        })
+        .from(goalTransactions)
+        .where(
+          and(
+            inArray(goalTransactions.goalId, catGoalIds),
+            gte(goalTransactions.createdAt, startOfMonth),
+            lt(goalTransactions.createdAt, startOfNextMonth)
+          )
+        );
+
+      let totalIncome = 0;
+      let totalExpenses = 0;
+      for (const transaction of categoryTransactions) {
+        const amount = Number.parseFloat(transaction.amount || "0");
+        if (transaction.type === "deposit") {
+          totalIncome += amount;
+        } else if (transaction.type === "withdrawal") {
+          totalExpenses += amount;
+        }
+      }
+
+      const categoryConfig = GOAL_CATEGORIES.find(
+        (cat) => cat.value === category
+      );
+      const categoryLabel = categoryConfig?.label || "Otro";
+
+      categoryReports.push({
+        category: categoryLabel,
+        totalIncome,
+        totalExpenses,
+        totalSavings: totalIncome - totalExpenses,
+        goalCount: catGoalIds.length,
+      });
+    }
+
+    const sortedCategoryReports = [...categoryReports].sort(
+      (a, b) => b.totalSavings - a.totalSavings
+    );
+
+    return createSuccessResult(
+      "Reportes por categoría obtenidos exitosamente",
+      {
+        data: sortedCategoryReports,
+      }
+    );
+  } catch (error) {
+    return handleActionError<{ data: CategoryReport[] }>(error, {
+      data: [],
+    });
+  }
+}
+
+export type GoalProgressReport = {
+  goalId: string;
+  title: string;
+  category: string;
+  currentAmount: number;
+  targetAmount: number;
+  progress: number;
+  status: string;
+};
+
+export async function getGoalProgressReportsAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<GoalProgressReport[]>("Unauthorized", {
+        message: "Debes iniciar sesión para ver el progreso de metas",
+        data: [],
+      });
+    }
+
+    const userGoals = await db
+      .select()
+      .from(goals)
+      .where(eq(goals.userId, session.user.id))
+      .orderBy(desc(goals.createdAt));
+
+    const progressReports: GoalProgressReport[] = [];
+
+    for (const dbGoal of userGoals) {
+      const targetAmount =
+        Number.parseFloat(dbGoal.targetAmount) || DEFAULT_AMOUNT;
+      const currentAmount =
+        Number.parseFloat(dbGoal.currentAmount) || DEFAULT_AMOUNT;
+      const progress =
+        targetAmount > 0
+          ? Math.round((currentAmount / targetAmount) * PERCENTAGE_MAX * 10) /
+            10
+          : 0;
+
+      const categoryConfig = GOAL_CATEGORIES.find(
+        (cat) => cat.value === dbGoal.category
+      );
+      const categoryLabel = categoryConfig?.label || "Otro";
+
+      progressReports.push({
+        goalId: dbGoal.id,
+        title: dbGoal.title,
+        category: categoryLabel,
+        currentAmount,
+        targetAmount,
+        progress: Math.min(progress, PERCENTAGE_MAX),
+        status: dbGoal.status as string,
+      });
+    }
+
+    return createSuccessResult("Progreso de metas obtenido exitosamente", {
+      data: progressReports,
+    });
+  } catch (error) {
+    return handleActionError<{ data: GoalProgressReport[] }>(error, {
+      data: [],
+    });
+  }
+}

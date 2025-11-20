@@ -18,6 +18,10 @@ import {
   getRecentAchievementsAction,
   markGoalAsCompletedAction,
   getMonthlySummaryAction,
+  getReportsSummaryAction,
+  getMonthlyAnalysisAction,
+  getCategoryReportsAction,
+  getGoalProgressReportsAction,
 } from "./goals";
 
 export const actions = {
@@ -40,5 +44,9 @@ export const actions = {
     getRecentAchievements: getRecentAchievementsAction,
     markAsCompleted: markGoalAsCompletedAction,
     getMonthlySummary: getMonthlySummaryAction,
+    getReportsSummary: getReportsSummaryAction,
+    getMonthlyAnalysis: getMonthlyAnalysisAction,
+    getCategoryReports: getCategoryReportsAction,
+    getGoalProgressReports: getGoalProgressReportsAction,
   },
 };
