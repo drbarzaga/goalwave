@@ -11,7 +11,7 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { actions } from "@/actions";
 import {
   Sheet,
@@ -22,7 +22,6 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import {
-  Plus,
   Bell,
   CheckCheck,
   Trash2,
@@ -34,6 +33,7 @@ import { cn } from "@/lib/utils";
 import { Notification } from "@/types/notification";
 import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import ModeToggle from "@/components/shared/mode-toggle";
+import CreateGoalButton from "@/components/features/goals/create-goal-button";
 
 const initialNotifications: Notification[] = [
   {
@@ -64,7 +64,6 @@ const initialNotifications: Notification[] = [
 
 export default function Topbar() {
   const pathname = usePathname();
-  const router = useRouter();
   const { state, isMobile } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [notifications, setNotifications] =
@@ -332,14 +331,7 @@ export default function Topbar() {
 
           <ModeToggle />
 
-          <Button
-            onClick={() => router.push("/goals/new")}
-            size="sm"
-            className="gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Nueva Meta
-          </Button>
+          <CreateGoalButton />
         </div>
       </div>
     </div>

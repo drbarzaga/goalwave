@@ -88,7 +88,13 @@ export function TipsPageContent() {
     async function loadTips() {
       try {
         const result = await actions.goals.getFinancialTips();
-        if (result.success && result.data) {
+        if (
+          result.success &&
+          result.data &&
+          typeof result.data === "object" &&
+          "tips" in result.data &&
+          Array.isArray(result.data.tips)
+        ) {
           const tipsWithConfig = result.data.tips.map((tip) => {
             const config = categoryConfig[tip.category] || defaultConfig;
             return {
@@ -119,9 +125,12 @@ export function TipsPageContent() {
     return (
       <div className="space-y-8">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Consejos Financieros</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Consejos Financieros
+          </h1>
           <p className="text-muted-foreground mt-2">
-            Aprende estrategias y mejores prácticas para alcanzar tus objetivos financieros
+            Aprende estrategias y mejores prácticas para alcanzar tus objetivos
+            financieros
           </p>
         </div>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -147,9 +156,12 @@ export function TipsPageContent() {
       <div className="space-y-8">
         {/* Header */}
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Consejos Financieros</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            Consejos Financieros
+          </h1>
           <p className="text-muted-foreground mt-2">
-            Aprende estrategias y mejores prácticas para alcanzar tus objetivos financieros
+            Aprende estrategias y mejores prácticas para alcanzar tus objetivos
+            financieros
           </p>
         </div>
 
@@ -195,7 +207,10 @@ export function TipsPageContent() {
       </div>
 
       {/* Detail Sheet */}
-      <Sheet open={!!selectedTip} onOpenChange={(open) => !open && setSelectedTip(null)}>
+      <Sheet
+        open={!!selectedTip}
+        onOpenChange={(open) => !open && setSelectedTip(null)}
+      >
         <SheetContent className="sm:max-w-[540px] overflow-y-auto p-0">
           {selectedTip && (
             <div className="flex flex-col h-full">
@@ -236,9 +251,9 @@ export function TipsPageContent() {
                     Consejos Prácticos
                   </h3>
                   <ul className="space-y-3">
-                    {selectedTip.tips.map((tipItem, index) => (
+                    {selectedTip.tips.map((tipItem) => (
                       <li
-                        key={index}
+                        key={tipItem}
                         className="flex items-start gap-3 text-sm text-muted-foreground"
                       >
                         <div

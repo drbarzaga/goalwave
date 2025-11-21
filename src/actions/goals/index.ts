@@ -1621,3 +1621,105 @@ export async function getFinancialTipsAction() {
     >(error, []);
   }
 }
+
+export type GeneratedGoal = {
+  title: string;
+  description: string;
+  category: string;
+  targetAmount: number;
+  currentAmount: number;
+  targetDate?: Date;
+  priority?: "high" | "medium" | "low";
+  savingFrequency: "daily" | "weekly" | "biweekly" | "monthly" | "custom";
+  reminderEnabled: boolean;
+};
+
+export async function generateGoalFromPromptAction(prompt: string) {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión para generar metas con IA",
+      });
+    }
+
+    const {
+      generateGoalFromPrompt,
+      canGenerateGoalToday,
+      getTodayGoalGenerationCount,
+    } = await import("@/lib/ai-goals");
+
+    // Verificar límite antes de generar
+    if (!canGenerateGoalToday(session.user.id)) {
+      const count = getTodayGoalGenerationCount(session.user.id);
+      return createErrorResult("Límite alcanzado", {
+        message: `Has alcanzado el límite de 5 metas generadas con IA por día (${count}/5). Intenta mañana o crea la meta manualmente.`,
+      });
+    }
+
+    const generatedGoal = await generateGoalFromPrompt(prompt, session.user.id);
+
+    return createSuccessResult("Meta generada exitosamente con IA", {
+      goal: generatedGoal,
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      return createErrorResult("Error generando meta", {
+        message: error.message,
+      });
+    }
+    return handleActionError<GeneratedGoal>(error, {
+      title: "",
+      description: "",
+      category: "other",
+      targetAmount: 0,
+      currentAmount: 0,
+      savingFrequency: "monthly",
+      reminderEnabled: false,
+    });
+  }
+}
+
+export async function getGoalGenerationLimitAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult("Unauthorized", {
+        message: "Debes iniciar sesión",
+      });
+    }
+
+    const {
+      canGenerateGoalToday,
+      getTodayGoalGenerationCount,
+    } = await import("@/lib/ai-goals");
+
+    const count = getTodayGoalGenerationCount(session.user.id);
+    const canGenerate = canGenerateGoalToday(session.user.id);
+
+    return createSuccessResult("Límite obtenido exitosamente", {
+      count,
+      limit: 5,
+      canGenerate,
+      remaining: Math.max(0, 5 - count),
+    });
+  } catch (error) {
+    return handleActionError<{
+      count: number;
+      limit: number;
+      canGenerate: boolean;
+      remaining: number;
+    }>(error, {
+      count: 0,
+      limit: 5,
+      canGenerate: true,
+      remaining: 5,
+    });
+  }
+}

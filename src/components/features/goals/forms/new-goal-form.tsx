@@ -119,6 +119,37 @@ export default function NewGoalForm() {
     });
   }, [watchedValues, updateFormData]);
 
+  // Sincronizar formulario cuando el contexto cambia (ej: desde AI generator)
+  useEffect(() => {
+    if (contextData.title && contextData.title !== watchedValues.title) {
+      setValue("title", contextData.title);
+    }
+    if (contextData.description !== watchedValues.description) {
+      setValue("description", contextData.description || "");
+    }
+    if (contextData.category && contextData.category !== watchedValues.category) {
+      setValue("category", contextData.category);
+    }
+    if (contextData.targetAmount && contextData.targetAmount !== watchedValues.targetAmount) {
+      setValue("targetAmount", contextData.targetAmount);
+    }
+    if (contextData.currentAmount !== watchedValues.currentAmount) {
+      setValue("currentAmount", contextData.currentAmount || "0");
+    }
+    if (contextData.date !== watchedValues.date) {
+      setValue("date", contextData.date || undefined);
+    }
+    if (contextData.priority !== watchedValues.priority) {
+      setValue("priority", contextData.priority || "");
+    }
+    if (contextData.savingFrequency !== watchedValues.savingFrequency) {
+      setValue("savingFrequency", contextData.savingFrequency || "monthly");
+    }
+    if (contextData.reminderEnabled !== watchedValues.reminderEnabled) {
+      setValue("reminderEnabled", contextData.reminderEnabled);
+    }
+  }, [contextData, setValue, watchedValues]);
+
   useEffect(() => {
     if (formState.fieldErrors) {
       for (const [field, messages] of Object.entries(formState.fieldErrors)) {

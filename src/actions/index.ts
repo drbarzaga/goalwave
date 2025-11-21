@@ -26,6 +26,8 @@ import {
   getDailyTipAction,
   getFinancialTipsAction,
   getTipDetailsAction,
+  generateGoalFromPromptAction,
+  getGoalGenerationLimitAction,
 } from "./goals";
 
 export const actions = {
@@ -56,5 +58,7 @@ export const actions = {
     getDailyTip: getDailyTipAction,
     getFinancialTips: getFinancialTipsAction,
     getTipDetails: getTipDetailsAction,
+    generateGoalFromPrompt: generateGoalFromPromptAction,
+    getGoalGenerationLimit: getGoalGenerationLimitAction,
   },
 };
