@@ -23,6 +23,9 @@ import {
   getCategoryReportsAction,
   getGoalProgressReportsAction,
   getAllTransactionsAction,
+  getDailyTipAction,
+  getFinancialTipsAction,
+  getTipDetailsAction,
 } from "./goals";
 
 export const actions = {
@@ -50,5 +53,8 @@ export const actions = {
     getCategoryReports: getCategoryReportsAction,
     getGoalProgressReports: getGoalProgressReportsAction,
     getAllTransactions: getAllTransactionsAction,
+    getDailyTip: getDailyTipAction,
+    getFinancialTips: getFinancialTipsAction,
+    getTipDetails: getTipDetailsAction,
   },
 };

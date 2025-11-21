@@ -20,6 +20,7 @@ import {
   CheckCircle2,
   Sparkles,
 } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { auth } from "@/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -70,9 +71,26 @@ export async function SettingsPageContent() {
           <div className="flex items-start justify-between">
             <div className="space-y-4 flex-1">
               <div className="flex items-center gap-3">
-                <div className="rounded-full bg-primary/10 p-3">
-                  <User className="h-6 w-6 text-primary" />
-                </div>
+                <Avatar className="h-16 w-16 shrink-0">
+                  <AvatarImage
+                    src={user.image || undefined}
+                    alt={user.name || "Usuario"}
+                    onError={(e) => {
+                      // Si la imagen falla al cargar, ocultarla para mostrar el fallback
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xl">
+                    {user.name
+                      ? user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")
+                          .toUpperCase()
+                          .slice(0, 2)
+                      : "U"}
+                  </AvatarFallback>
+                </Avatar>
                 <div>
                   <h2 className="text-xl font-semibold">
                     {user.name || "Usuario"}

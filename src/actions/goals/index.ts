@@ -1558,3 +1558,66 @@ export async function getAllTransactionsAction() {
     });
   }
 }
+
+// Daily Tip Action
+export type DailyTip = {
+  title: string;
+  description: string;
+};
+
+export async function getDailyTipAction() {
+  // getDailyTip maneja errores internamente y siempre retorna un consejo válido
+  const { getDailyTip } = await import("@/lib/ai-tips");
+  const tip = await getDailyTip();
+
+  return createSuccessResult("Consejo del día obtenido exitosamente", {
+    tip,
+  });
+}
+
+export type TipDetails = {
+  detailedDescription: string;
+  tips: string[];
+};
+
+export async function getTipDetailsAction(
+  title: string,
+  description: string,
+  category: string
+) {
+  try {
+    const { getTipDetails } = await import("@/lib/ai-tips");
+    const details = await getTipDetails(title, description, category);
+
+    return createSuccessResult("Detalles del consejo obtenidos exitosamente", {
+      details,
+    });
+  } catch (error) {
+    return handleActionError<TipDetails>(error, {
+      detailedDescription: "",
+      tips: [],
+    });
+  }
+}
+
+export async function getFinancialTipsAction() {
+  try {
+    const { getFinancialTips } = await import("@/lib/ai-tips");
+    const tips = await getFinancialTips();
+
+    return createSuccessResult("Consejos obtenidos exitosamente", {
+      tips,
+    });
+  } catch (error) {
+    return handleActionError<
+      Array<{
+        id: string;
+        title: string;
+        description: string;
+        category: string;
+        detailedDescription: string;
+        tips: string[];
+      }>
+    >(error, []);
+  }
+}

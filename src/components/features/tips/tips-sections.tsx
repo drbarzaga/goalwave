@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Sheet,
@@ -18,132 +18,129 @@ import {
   Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { actions } from "@/actions";
 
 interface Tip {
   id: string;
   title: string;
   description: string;
-  detailedDescription: string;
-  icon: typeof Lightbulb;
   category: string;
-  color: string;
-  bgColor: string;
+  detailedDescription: string;
   tips: string[];
+  icon?: typeof Lightbulb;
+  color?: string;
+  bgColor?: string;
 }
 
-const financialTips: Tip[] = [
+// Mapeo de iconos y colores por categoría
+const categoryConfig: Record<
+  string,
   {
-    id: "1",
-    title: "Establece metas claras y alcanzables",
-    description:
-      "Define objetivos específicos con fechas límite y montos concretos. Esto te ayudará a mantenerte enfocado y motivado.",
-    detailedDescription:
-      "Las metas financieras efectivas siguen el principio SMART: Específicas, Medibles, Alcanzables, Relevantes y con Tiempo definido. En lugar de decir 'quiero ahorrar más', establece 'quiero ahorrar $5,000 para un viaje a Europa en 12 meses'.",
+    icon: typeof Lightbulb;
+    color: string;
+    bgColor: string;
+  }
+> = {
+  Planificación: {
     icon: Target,
-    category: "Planificación",
     color: "text-blue-600 dark:text-blue-400",
     bgColor: "bg-blue-500/10",
-    tips: [
-      "Escribe tus metas y revísalas regularmente",
-      "Divide metas grandes en pasos más pequeños",
-      "Establece fechas límite realistas",
-      "Celebra cada hito alcanzado",
-    ],
   },
-  {
-    id: "2",
-    title: "Crea un fondo de emergencia",
-    description:
-      "Ahorra al menos 3-6 meses de gastos básicos. Este fondo te protegerá ante imprevistos sin afectar tus metas a largo plazo.",
-    detailedDescription:
-      "Un fondo de emergencia es tu red de seguridad financiera. Debe cubrir gastos esenciales como vivienda, alimentación, transporte y servicios básicos. Mantén este dinero en una cuenta de fácil acceso pero separada de tus gastos diarios.",
+  Ahorro: {
     icon: DollarSign,
-    category: "Ahorro",
     color: "text-emerald-600 dark:text-emerald-400",
     bgColor: "bg-emerald-500/10",
-    tips: [
-      "Comienza con un objetivo pequeño ($1,000)",
-      "Automatiza transferencias mensuales",
-      "No uses este fondo para gastos no esenciales",
-      "Revisa y ajusta el monto anualmente",
-    ],
   },
-  {
-    id: "3",
-    title: "Revisa tus gastos regularmente",
-    description:
-      "Analiza tus reportes mensuales para identificar patrones de gasto y oportunidades de ahorro.",
-    detailedDescription:
-      "El conocimiento es poder cuando se trata de finanzas personales. Revisar regularmente tus gastos te permite identificar áreas donde puedes reducir costos, detectar suscripciones innecesarias y ajustar tu presupuesto según tus necesidades reales.",
+  Análisis: {
     icon: BarChart3,
-    category: "Análisis",
     color: "text-purple-600 dark:text-purple-400",
     bgColor: "bg-purple-500/10",
-    tips: [
-      "Revisa tus transacciones semanalmente",
-      "Categoriza tus gastos para mejor análisis",
-      "Identifica gastos recurrentes innecesarios",
-      "Compara mes a mes para ver tendencias",
-    ],
   },
-  {
-    id: "4",
-    title: "Automatiza tus ahorros",
-    description:
-      "Configura transferencias automáticas hacia tus metas. Pagarte a ti mismo primero es clave para el éxito financiero.",
-    detailedDescription:
-      "La automatización elimina la tentación de gastar dinero que deberías ahorrar. Al programar transferencias automáticas justo después de recibir tu ingreso, te aseguras de que el ahorro sea una prioridad, no un pensamiento posterior.",
+  Automatización: {
     icon: TrendingUp,
-    category: "Automatización",
     color: "text-amber-600 dark:text-amber-400",
     bgColor: "bg-amber-500/10",
-    tips: [
-      "Configura transferencias el día que recibes tu pago",
-      "Comienza con un porcentaje pequeño (5-10%)",
-      "Aumenta gradualmente el monto",
-      "Usa cuentas separadas para diferentes metas",
-    ],
   },
-  {
-    id: "5",
-    title: "Prioriza tus metas",
-    description:
-      "No todas las metas son igual de importantes. Enfócate primero en las que tienen mayor impacto en tu bienestar financiero.",
-    detailedDescription:
-      "Tener múltiples metas financieras puede ser abrumador. Priorizar te ayuda a concentrar tus recursos donde más importan. Generalmente, el fondo de emergencia y la deuda de alto interés deben ser las primeras prioridades antes de metas de largo plazo.",
+  Estrategia: {
     icon: Target,
-    category: "Estrategia",
     color: "text-indigo-600 dark:text-indigo-400",
     bgColor: "bg-indigo-500/10",
-    tips: [
-      "Clasifica tus metas por urgencia e importancia",
-      "Enfócate en 2-3 metas a la vez",
-      "Revisa y ajusta prioridades trimestralmente",
-      "No te sientas mal por posponer metas menos críticas",
-    ],
   },
-  {
-    id: "6",
-    title: "Celebra los pequeños logros",
-    description:
-      "Reconocer tu progreso, incluso en metas pequeñas, te mantendrá motivado para continuar con tus objetivos más grandes.",
-    detailedDescription:
-      "La motivación es crucial para mantener hábitos financieros saludables. Celebrar pequeños logros crea un ciclo positivo de refuerzo que te mantiene comprometido con tus objetivos a largo plazo. No esperes hasta alcanzar la meta completa para reconocer tu esfuerzo.",
+  Motivación: {
     icon: Sparkles,
-    category: "Motivación",
     color: "text-rose-600 dark:text-rose-400",
     bgColor: "bg-rose-500/10",
-    tips: [
-      "Establece mini-celebraciones en hitos del 25%, 50%, 75%",
-      "Comparte tus logros con familiares o amigos",
-      "Mantén un registro visual de tu progreso",
-      "Recuerda por qué empezaste cuando te sientas desmotivado",
-    ],
   },
-];
+};
+
+const defaultConfig = {
+  icon: Lightbulb,
+  color: "text-blue-600 dark:text-blue-400",
+  bgColor: "bg-blue-500/10",
+};
 
 export function TipsPageContent() {
+  const [tips, setTips] = useState<Tip[]>([]);
   const [selectedTip, setSelectedTip] = useState<Tip | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function loadTips() {
+      try {
+        const result = await actions.goals.getFinancialTips();
+        if (result.success && result.data) {
+          const tipsWithConfig = result.data.tips.map((tip) => {
+            const config = categoryConfig[tip.category] || defaultConfig;
+            return {
+              ...tip,
+              icon: config.icon,
+              color: config.color,
+              bgColor: config.bgColor,
+            };
+          });
+          setTips(tipsWithConfig);
+        }
+      } catch (error) {
+        console.error("Error cargando consejos:", error);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    loadTips();
+  }, []);
+
+  const handleTipClick = (tip: Tip) => {
+    // Los detalles ya vienen incluidos desde la carga inicial
+    setSelectedTip(tip);
+  };
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Consejos Financieros</h1>
+          <p className="text-muted-foreground mt-2">
+            Aprende estrategias y mejores prácticas para alcanzar tus objetivos financieros
+          </p>
+        </div>
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader>
+                <div className="h-6 bg-muted rounded w-3/4" />
+                <div className="h-4 bg-muted rounded w-1/2 mt-2" />
+              </CardHeader>
+              <CardContent>
+                <div className="h-4 bg-muted rounded w-full mb-2" />
+                <div className="h-4 bg-muted rounded w-5/6" />
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -158,13 +155,13 @@ export function TipsPageContent() {
 
         {/* Tips Grid */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {financialTips.map((tip) => {
-            const Icon = tip.icon;
+          {tips.map((tip) => {
+            const Icon = tip.icon || Lightbulb;
             return (
               <Card
                 key={tip.id}
                 className="hover:shadow-lg transition-all duration-300 cursor-pointer group border-border/40 hover:border-primary/40"
-                onClick={() => setSelectedTip(tip)}
+                onClick={() => handleTipClick(tip)}
               >
                 <CardHeader>
                   <div className="flex items-start gap-3">
@@ -207,7 +204,10 @@ export function TipsPageContent() {
                   <div
                     className={`rounded-xl p-3 ${selectedTip.bgColor} ${selectedTip.color} shrink-0`}
                   >
-                    <selectedTip.icon className="h-6 w-6" />
+                    {(() => {
+                      const Icon = selectedTip.icon || Lightbulb;
+                      return <Icon className="h-6 w-6" />;
+                    })()}
                   </div>
                   <Badge variant="outline" className="text-xs">
                     {selectedTip.category}
@@ -241,7 +241,9 @@ export function TipsPageContent() {
                         key={index}
                         className="flex items-start gap-3 text-sm text-muted-foreground"
                       >
-                        <div className={`rounded-full p-1 ${selectedTip.bgColor} ${selectedTip.color} shrink-0 mt-0.5`}>
+                        <div
+                          className={`rounded-full p-1 ${selectedTip.bgColor} ${selectedTip.color} shrink-0 mt-0.5`}
+                        >
                           <div className="h-1.5 w-1.5 rounded-full bg-current" />
                         </div>
                         <span className="leading-relaxed">{tipItem}</span>

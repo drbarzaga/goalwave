@@ -536,6 +536,13 @@ export async function RecentActivitySection() {
 
 // Daily Tip Section
 export async function DailyTipSection() {
+  const result = await actions.goals.getDailyTip();
+  const tip = result.success && result.data ? result.data.tip : {
+    title: "Regla 50/30/20",
+    description:
+      "Destina el 50% de tus ingresos a necesidades básicas, 30% a deseos y gustos, y 20% a ahorros e inversiones. Esta estrategia te ayudará a mantener un balance financiero saludable.",
+  };
+
   return (
     <Card className="relative overflow-hidden bg-linear-to-br from-blue-50 via-cyan-50/50 to-blue-50 dark:from-blue-950/40 dark:via-cyan-950/30 dark:to-blue-950/40 border-blue-200 dark:border-blue-800/50 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/10 dark:hover:shadow-blue-500/20">
       <div className="absolute inset-0 bg-linear-to-br from-blue-500/5 to-transparent pointer-events-none" />
@@ -550,11 +557,9 @@ export async function DailyTipSection() {
       <CardContent className="space-y-4 relative">
         <p className="text-sm leading-relaxed text-foreground">
           <strong className="text-blue-700 dark:text-blue-300 font-semibold">
-            Regla 50/30/20:
+            {tip.title}:
           </strong>{" "}
-          Destina el 50% de tus ingresos a necesidades básicas, 30% a deseos y
-          gustos, y 20% a ahorros e inversiones. Esta estrategia te ayudará a
-          mantener un balance financiero saludable.
+          {tip.description}
         </p>
         <div className="pt-2">
           <Link href="/tips">
