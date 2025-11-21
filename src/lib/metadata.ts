@@ -126,4 +126,28 @@ export const pageMetadata = {
       keywords: ["reportes", "análisis financiero", "estadísticas", "progreso"],
       noindex: true,
     }),
+
+  activity: (): Metadata =>
+    createPageMetadata({
+      title: "Actividad",
+      description: `Historial completo de todas tus transacciones financieras en ${appName}.`,
+      keywords: ["actividad", "transacciones", "historial", "movimientos"],
+      noindex: true,
+    }),
+
+  tips: (): Metadata =>
+    createPageMetadata({
+      title: "Consejos Financieros",
+      description: `Aprende estrategias y mejores prácticas para alcanzar tus objetivos financieros con ${appName}.`,
+      keywords: ["consejos", "tips", "finanzas personales", "educación financiera"],
+      noindex: true,
+    }),
+
+  settings: (): Metadata =>
+    createPageMetadata({
+      title: "Configuración",
+      description: `Gestiona tu cuenta y preferencias en ${appName}.`,
+      keywords: ["configuración", "ajustes", "perfil", "cuenta"],
+      noindex: true,
+    }),
 };

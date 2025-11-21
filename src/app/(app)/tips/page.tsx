@@ -1,5 +1,8 @@
-import React from "react";
+import { pageMetadata } from "@/lib/metadata";
+import { TipsPageContent } from "@/components/features/tips/tips-sections";
+
+export const metadata = pageMetadata.tips();
 
 export default function TipsPage() {
-  return <div>TipsPage</div>;
+  return <TipsPageContent />;
 }

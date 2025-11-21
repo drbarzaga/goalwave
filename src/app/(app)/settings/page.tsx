@@ -1,5 +1,8 @@
-import React from "react";
+import { pageMetadata } from "@/lib/metadata";
+import { SettingsPageContent } from "@/components/features/settings/settings-sections";
+
+export const metadata = pageMetadata.settings();
 
 export default function SettingsPage() {
-  return <div>SettingsPage</div>;
+  return <SettingsPageContent />;
 }

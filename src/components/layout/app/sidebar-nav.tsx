@@ -8,8 +8,6 @@ import {
   TrendingUp,
   Lightbulb,
   BarChart3,
-  Wallet,
-  PiggyBank,
 } from "lucide-react";
 import NotificationsPanel from "./notifications-panel";
 import { UserMenu } from "./user-menu";
@@ -41,16 +39,6 @@ const navItems = [
     title: "Reportes",
     href: "/reports",
     icon: BarChart3,
-  },
-  {
-    title: "Presupuestos",
-    href: "/budgets",
-    icon: Wallet,
-  },
-  {
-    title: "Ahorros",
-    href: "/savings",
-    icon: PiggyBank,
   },
   {
     title: "Actividad",
@@ -108,7 +96,7 @@ export default function SidebarNav() {
                       tooltip={item.title}
                       className={cn(
                         "rounded-lg",
-                        !isCollapsed && "px-3 py-2.5 !h-auto min-h-[2.5rem]",
+                        !isCollapsed && "px-3 py-2.5 h-auto! min-h-10!",
                         isActive
                           ? "bg-primary text-primary-foreground shadow-sm hover:bg-primary hover:text-primary-foreground data-[active=true]:bg-primary data-[active=true]:text-primary-foreground"
                           : "text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"

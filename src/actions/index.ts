@@ -22,6 +22,7 @@ import {
   getMonthlyAnalysisAction,
   getCategoryReportsAction,
   getGoalProgressReportsAction,
+  getAllTransactionsAction,
 } from "./goals";
 
 export const actions = {
@@ -48,5 +49,6 @@ export const actions = {
     getMonthlyAnalysis: getMonthlyAnalysisAction,
     getCategoryReports: getCategoryReportsAction,
     getGoalProgressReports: getGoalProgressReportsAction,
+    getAllTransactions: getAllTransactionsAction,
   },
 };

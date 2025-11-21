@@ -1455,3 +1455,103 @@ export async function getGoalProgressReportsAction() {
     });
   }
 }
+
+// Activity Actions
+export type ActivityTransaction = {
+  id: string;
+  goalId: string;
+  goalTitle: string;
+  goalCategory: string;
+  type: "deposit" | "withdrawal";
+  amount: number;
+  description?: string;
+  createdAt: string;
+};
+
+export async function getAllTransactionsAction() {
+  try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    });
+
+    if (!session) {
+      return createErrorResult<ActivityTransaction[]>("Unauthorized", {
+        message: "Debes iniciar sesión para ver la actividad",
+        data: [],
+      });
+    }
+
+    // Get all user's goals
+    const userGoals = await db
+      .select({
+        id: goals.id,
+        title: goals.title,
+        category: goals.category,
+      })
+      .from(goals)
+      .where(eq(goals.userId, session.user.id));
+
+    const goalIds = userGoals.map((g) => g.id);
+
+    if (goalIds.length === 0) {
+      return createSuccessResult("Actividad obtenida exitosamente", {
+        data: [],
+      });
+    }
+
+    // Get all transactions for user's goals
+    const transactionsData = await db
+      .select({
+        id: goalTransactions.id,
+        goalId: goalTransactions.goalId,
+        type: goalTransactions.type,
+        amount: goalTransactions.amount,
+        description: goalTransactions.description,
+        createdAt: goalTransactions.createdAt,
+      })
+      .from(goalTransactions)
+      .where(inArray(goalTransactions.goalId, goalIds))
+      .orderBy(desc(goalTransactions.createdAt))
+      .limit(100); // Limit to last 100 transactions
+
+    // Create a map of goal IDs to goal info
+    const goalMap = new Map(
+      userGoals.map((g) => [
+        g.id,
+        {
+          title: g.title,
+          category: g.category || "other",
+        },
+      ])
+    );
+
+    const categoryConfigs = new Map(
+      GOAL_CATEGORIES.map((cat) => [cat.value, cat.label])
+    );
+
+    const transactions: ActivityTransaction[] = transactionsData.map((tx) => {
+      const goalInfo = goalMap.get(tx.goalId);
+      const categoryLabel =
+        categoryConfigs.get(goalInfo?.category || "other") || "Otro";
+
+      return {
+        id: tx.id,
+        goalId: tx.goalId,
+        goalTitle: goalInfo?.title || "Meta desconocida",
+        goalCategory: categoryLabel,
+        type: tx.type as "deposit" | "withdrawal",
+        amount: Number.parseFloat(tx.amount) || 0,
+        description: tx.description || undefined,
+        createdAt: tx.createdAt.toISOString(),
+      };
+    });
+
+    return createSuccessResult("Actividad obtenida exitosamente", {
+      data: transactions,
+    });
+  } catch (error) {
+    return handleActionError<ActivityTransaction[]>(error, {
+      data: [],
+    });
+  }
+}
