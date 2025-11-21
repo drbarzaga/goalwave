@@ -1,9 +1,18 @@
 import { Suspense } from "react";
 import { DollarSign, TrendingDown, TrendingUp, BarChart3 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import StatsCard from "@/components/features/dashboard/stats-card";
-import { getReportsSummaryAction, getMonthlyAnalysisAction } from "@/actions/goals";
+import {
+  getReportsSummaryAction,
+  getMonthlyAnalysisAction,
+} from "@/actions/goals";
 import { MonthlyChart } from "./monthly-chart";
 import { ReportsSkeleton } from "./reports-skeletons";
 import { CategoryReportsSection } from "./category-reports-section";
@@ -25,7 +34,7 @@ function formatPercentage(value: number): string {
 export async function ReportsStatsSection() {
   const result = await getReportsSummaryAction();
 
-  if (!result.success) {
+  if (!result.success || !result.data) {
     return (
       <div className="text-center py-8 text-muted-foreground">
         No se pudieron cargar las estadísticas
@@ -33,7 +42,13 @@ export async function ReportsStatsSection() {
     );
   }
 
-  const { currentMonth, incomeChange, expensesChange, savingsChange, savingsRateChange } = result.data;
+  const {
+    currentMonth,
+    incomeChange,
+    expensesChange,
+    savingsChange,
+    savingsRateChange,
+  } = result.data;
 
   const stats = [
     {
@@ -41,28 +56,28 @@ export async function ReportsStatsSection() {
       value: formatCurrency(currentMonth.totalIncome),
       change: `${formatPercentage(incomeChange)} vs mes anterior`,
       icon: DollarSign,
-      trend: incomeChange >= 0 ? "up" : "down" as const,
+      trend: incomeChange >= 0 ? ("up" as const) : ("down" as const),
     },
     {
       title: "Gastos Totales",
       value: formatCurrency(currentMonth.totalExpenses),
       change: `${formatPercentage(expensesChange)} vs mes anterior`,
       icon: TrendingDown,
-      trend: expensesChange <= 0 ? "up" : "down" as const,
+      trend: expensesChange <= 0 ? ("up" as const) : ("down" as const),
     },
     {
       title: "Ahorro Total",
       value: formatCurrency(currentMonth.totalSavings),
       change: `${formatPercentage(savingsChange)} vs mes anterior`,
       icon: BarChart3,
-      trend: savingsChange >= 0 ? "up" : "down" as const,
+      trend: savingsChange >= 0 ? ("up" as const) : ("down" as const),
     },
     {
       title: "Tasa de Ahorro",
       value: `${currentMonth.savingsRate.toFixed(1)}%`,
       change: `${formatPercentage(savingsRateChange)} vs mes anterior`,
       icon: TrendingUp,
-      trend: savingsRateChange >= 0 ? "up" : "down" as const,
+      trend: savingsRateChange >= 0 ? ("up" as const) : ("down" as const),
     },
   ];
 
@@ -85,7 +100,14 @@ export async function ReportsStatsSection() {
 export async function MonthlyAnalysisSection() {
   const result = await getMonthlyAnalysisAction();
 
-  if (!result.success || !result.data.data || result.data.data.length === 0) {
+  if (
+    !result.success ||
+    !result.data ||
+    typeof result.data !== "object" ||
+    !("data" in result.data) ||
+    !Array.isArray(result.data.data) ||
+    result.data.data.length === 0
+  ) {
     return (
       <Card>
         <CardHeader>
@@ -143,19 +165,31 @@ export function ReportsPageContent() {
         </TabsList>
 
         <TabsContent value="summary" className="space-y-6">
-          <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
+          <Suspense
+            fallback={
+              <div className="h-96 animate-pulse bg-muted rounded-lg" />
+            }
+          >
             <MonthlyAnalysisSection />
           </Suspense>
         </TabsContent>
 
         <TabsContent value="categories" className="space-y-6">
-          <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
+          <Suspense
+            fallback={
+              <div className="h-96 animate-pulse bg-muted rounded-lg" />
+            }
+          >
             <CategoryReportsSection />
           </Suspense>
         </TabsContent>
 
         <TabsContent value="goals" className="space-y-6">
-          <Suspense fallback={<div className="h-96 animate-pulse bg-muted rounded-lg" />}>
+          <Suspense
+            fallback={
+              <div className="h-96 animate-pulse bg-muted rounded-lg" />
+            }
+          >
             <GoalProgressSection />
           </Suspense>
         </TabsContent>
@@ -163,4 +197,3 @@ export function ReportsPageContent() {
     </div>
   );
 }
-

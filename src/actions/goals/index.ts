@@ -1292,7 +1292,7 @@ export async function getCategoryReportsAction() {
     });
 
     if (!session) {
-      return createErrorResult<CategoryReport[]>("Unauthorized", {
+      return createErrorResult<{ data: CategoryReport[] }>("Unauthorized", {
         message: "Debes iniciar sesión para ver los reportes por categoría",
         data: [],
       });
@@ -1405,7 +1405,7 @@ export async function getGoalProgressReportsAction() {
     });
 
     if (!session) {
-      return createErrorResult<GoalProgressReport[]>("Unauthorized", {
+      return createErrorResult<{ data: GoalProgressReport[] }>("Unauthorized", {
         message: "Debes iniciar sesión para ver el progreso de metas",
         data: [],
       });
@@ -1475,10 +1475,13 @@ export async function getAllTransactionsAction() {
     });
 
     if (!session) {
-      return createErrorResult<ActivityTransaction[]>("Unauthorized", {
-        message: "Debes iniciar sesión para ver la actividad",
-        data: [],
-      });
+      return createErrorResult<{ data: ActivityTransaction[] }>(
+        "Unauthorized",
+        {
+          message: "Debes iniciar sesión para ver la actividad",
+          data: [],
+        }
+      );
     }
 
     // Get all user's goals
@@ -1550,7 +1553,7 @@ export async function getAllTransactionsAction() {
       data: transactions,
     });
   } catch (error) {
-    return handleActionError<ActivityTransaction[]>(error, {
+    return handleActionError<{ data: ActivityTransaction[] }>(error, {
       data: [],
     });
   }

@@ -1,5 +1,12 @@
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { getCategoryReportsAction } from "@/actions/goals";
+import type { CategoryReport } from "@/actions/goals";
 import { TrendingUp, TrendingDown, DollarSign, Target } from "lucide-react";
 
 function formatCurrency(amount: number): string {
@@ -32,9 +39,13 @@ export async function CategoryReportsSection() {
     );
   }
 
-  const categoryData = result.data.data;
-
-  if (categoryData.length === 0) {
+  if (
+    !result.data ||
+    typeof result.data !== "object" ||
+    !("data" in result.data) ||
+    !Array.isArray(result.data.data) ||
+    result.data.data.length === 0
+  ) {
     return (
       <Card>
         <CardHeader>
@@ -51,6 +62,8 @@ export async function CategoryReportsSection() {
       </Card>
     );
   }
+
+  const categoryData: CategoryReport[] = result.data.data;
 
   return (
     <Card>
@@ -73,7 +86,8 @@ export async function CategoryReportsSection() {
                   <h3 className="font-semibold text-lg">{category.category}</h3>
                 </div>
                 <span className="text-sm text-muted-foreground">
-                  {category.goalCount} {category.goalCount === 1 ? "meta" : "metas"}
+                  {category.goalCount}{" "}
+                  {category.goalCount === 1 ? "meta" : "metas"}
                 </span>
               </div>
 
@@ -115,4 +129,3 @@ export async function CategoryReportsSection() {
     </Card>
   );
 }
-

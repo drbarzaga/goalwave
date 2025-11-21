@@ -1,8 +1,15 @@
 import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { getGoalProgressReportsAction } from "@/actions/goals";
+import type { GoalProgressReport } from "@/actions/goals";
 import { Target, ArrowRight } from "lucide-react";
 
 function formatCurrency(amount: number): string {
@@ -14,7 +21,9 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-function getStatusBadgeVariant(status: string): "default" | "secondary" | "destructive" | "outline" {
+function getStatusBadgeVariant(
+  status: string
+): "default" | "secondary" | "destructive" | "outline" {
   switch (status) {
     case "active":
       return "default";
@@ -61,9 +70,13 @@ export async function GoalProgressSection() {
     );
   }
 
-  const progressData = result.data.data;
-
-  if (progressData.length === 0) {
+  if (
+    !result.data ||
+    typeof result.data !== "object" ||
+    !("data" in result.data) ||
+    !Array.isArray(result.data.data) ||
+    result.data.data.length === 0
+  ) {
     return (
       <Card>
         <CardHeader>
@@ -80,6 +93,8 @@ export async function GoalProgressSection() {
       </Card>
     );
   }
+
+  const progressData: GoalProgressReport[] = result.data.data;
 
   // Group by status
   const activeGoals = progressData.filter((g) => g.status === "active");
@@ -115,7 +130,9 @@ export async function GoalProgressSection() {
                         {goal.title}
                       </h3>
                     </div>
-                    <p className="text-sm text-muted-foreground">{goal.category}</p>
+                    <p className="text-sm text-muted-foreground">
+                      {goal.category}
+                    </p>
                   </div>
                   <Badge variant={getStatusBadgeVariant(goal.status)}>
                     {getStatusLabel(goal.status)}
@@ -125,7 +142,9 @@ export async function GoalProgressSection() {
                 <div className="space-y-2">
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">Progreso</span>
-                    <span className="font-medium">{goal.progress.toFixed(1)}%</span>
+                    <span className="font-medium">
+                      {goal.progress.toFixed(1)}%
+                    </span>
                   </div>
                   <Progress value={goal.progress} className="h-2" />
                   <div className="flex items-center justify-between text-sm pt-1">
@@ -144,4 +163,3 @@ export async function GoalProgressSection() {
     </Card>
   );
 }
-
